@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c0d12">
+<title>Timetable</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="topbar-row">
+      <div class="brand">
+        <a href="index.html" class="btn sm ghost" aria-label="Zur Übersicht">←</a>
+        <h1 id="evname">Timetable</h1>
+        <span class="venue" id="evvenue"></span>
+      </div>
+      <span class="clock" id="clock">--:--</span>
+    </div>
+
+    <nav class="daytabs" id="daytabs" aria-label="Festivaltag wählen"></nav>
+
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Ansicht">
+        <button type="button" id="viewGrid" aria-pressed="false">Raster</button>
+        <button type="button" id="viewList" aria-pressed="false">Liste</button>
+      </div>
+
+      <label class="search">
+        <span class="sr">Act suchen</span>
+        <input type="search" id="q" placeholder="Act suchen…" autocomplete="off">
+        <button type="button" class="clear" id="qclear" hidden aria-label="Suche leeren">×</button>
+      </label>
+
+      <button type="button" class="btn" id="onlyFavs" aria-pressed="false">★ Nur meine Sets</button>
+      <button type="button" class="btn ghost" id="share">Teilen</button>
+      <span class="faint" id="count"></span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="banner" id="banner" hidden></div>
+  <div id="view"></div>
+</main>
+
+<footer class="wrap footer">
+  <p>Markierte Sets liegen nur in diesem Browser (localStorage) – nichts wird hochgeladen.
+     Zum Mitnehmen auf ein anderes Gerät den Teilen-Link verwenden.</p>
+</footer>
+
+<dialog id="shareDlg">
+  <h2>Plan teilen</h2>
+  <p class="muted" id="shareInfo"></p>
+  <div class="sharebox">
+    <input type="text" id="shareUrl" readonly aria-label="Link zum Teilen">
+    <button type="button" class="btn" id="shareCopy">Kopieren</button>
+  </div>
+  <div class="actions">
+    <button type="button" class="btn ghost" id="shareNative" hidden>Senden…</button>
+    <button type="button" class="btn" onclick="document.getElementById('shareDlg').close()">Schließen</button>
+  </div>
+</dialog>
+
+<script src="assets/core.js"></script>
+<script src="assets/event.js"></script>
+</body>
+</html>

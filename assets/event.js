@@ -1,0 +1,500 @@
+/* Timetable-Ansicht: Raster/Liste, Favoriten, Suche, Live-Marker, Teilen. */
+(function () {
+  'use strict';
+
+  const $ = (sel, root) => (root || document).querySelector(sel);
+  const params = new URLSearchParams(location.search);
+
+  const state = {
+    ev: null,
+    dayId: null,
+    view: null,          // 'grid' | 'list'
+    query: '',
+    onlyFavs: false,
+    favs: null,
+    sharedIds: null,     // IDs aus einem geteilten Link
+    viewingShared: false,
+    didAutoScroll: false,
+    isDraft: false,
+  };
+
+  const VIEW_KEY = 'tt.view';
+
+  /* ---------- Start ---------- */
+
+  async function init() {
+    const id = params.get('e');
+    if (!id) return fail('Kein Event angegeben. <a href="index.html">Zur Übersicht</a>');
+
+    // Vorschau aus dem Admin-Editor: Entwurf aus localStorage statt der veroeffentlichten Datei.
+    const draft = params.get('draft') === '1' ? TT.readStore('tt.draft', null) : null;
+    if (draft && draft.id === id) {
+      state.ev = TT.prepare(draft);
+      state.isDraft = true;
+    } else {
+      try {
+        state.ev = await TT.loadEventById(id);
+      } catch (err) {
+        return fail('Timetable konnte nicht geladen werden: ' + TT.escapeHtml(err.message) +
+          '<br><a href="index.html">Zur Übersicht</a>');
+      }
+    }
+
+    const ev = state.ev;
+    document.title = ev.name + ' – Timetable';
+    $('#evname').textContent = ev.name;
+    if (ev.venue) $('#evvenue').textContent = ev.venue;
+
+    state.favs = TT.makeFavourites(ev.id);
+
+    const shared = TT.decodeFavs(params.get('fav'));
+    const knownIds = new Set(ev.sets.map((s) => s.id));
+    const validShared = shared.filter((sid) => knownIds.has(sid));
+    if (validShared.length) {
+      state.sharedIds = new Set(validShared);
+      state.viewingShared = true;
+      showSharedBanner(validShared.length, shared.length - validShared.length);
+    }
+
+    if (state.isDraft && !state.viewingShared) {
+      const el = $('#banner');
+      el.hidden = false;
+      el.innerHTML = '<p><strong>Vorschau</strong> – unveröffentlichter Entwurf aus dem Editor. ' +
+        'Erst nach dem Commit sehen andere diesen Stand.</p>' +
+        '<a class="btn sm ghost" href="admin.html">Zurück zum Editor</a>';
+    }
+
+    const wantedDay = params.get('d');
+    state.dayId = ev.days.some((d) => d.id === wantedDay) ? wantedDay : TT.currentDayId(ev);
+
+    const storedView = TT.readStore(VIEW_KEY, null);
+    state.view = storedView === 'grid' || storedView === 'list'
+      ? storedView
+      : (window.matchMedia('(max-width: 760px)').matches ? 'list' : 'grid');
+
+    buildDayTabs();
+    wireControls();
+
+    // Einmalige Delegation: #view wird bei jedem Render neu befuellt, bleibt aber bestehen.
+    $('#view').addEventListener('click', (e) => {
+      const el = e.target.closest('[data-set]');
+      if (!el) return;
+      const set = state.ev.sets.find((s) => s.id === el.dataset.set);
+      if (set) toggleFav(set);
+    });
+
+    render();
+
+    tickClock();
+    setInterval(tickClock, 15000);
+    setInterval(() => render({ keepScroll: true }), 60000);
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => render({ keepScroll: true }), 180);
+    });
+  }
+
+  function fail(html) {
+    $('#view').innerHTML = '<div class="error">' + html + '</div>';
+  }
+
+  /* ---------- Favoriten-Quelle ---------- */
+
+  const activeIds = () => (state.viewingShared ? state.sharedIds : new Set(state.favs.list()));
+  const isFav = (set) => activeIds().has(set.id);
+
+  function toggleFav(set) {
+    if (state.viewingShared) {
+      flash('Das ist ein geteilter Plan. Oben „Zu meinem Plan hinzufügen“ oder „Eigenen Plan“ wählen.');
+      return;
+    }
+    state.favs.toggle(set.id);
+    render({ keepScroll: true });
+  }
+
+  /* ---------- Banner für geteilte Pläne ---------- */
+
+  function showSharedBanner(count, dropped) {
+    const el = $('#banner');
+    el.hidden = false;
+    el.innerHTML =
+      '<p><strong>Geteilter Plan</strong> mit ' + count + ' Set' + (count === 1 ? '' : 's') +
+      '. Deine eigenen Favoriten sind unberührt.' +
+      (dropped ? ' <span class="faint">(' + dropped + ' Set(s) aus dem Link existieren nicht mehr.)</span>' : '') +
+      '</p>' +
+      '<button class="btn sm" id="adopt">Zu meinem Plan hinzufügen</button>' +
+      '<button class="btn sm ghost" id="ownplan">Eigenen Plan</button>';
+
+    $('#adopt').addEventListener('click', () => {
+      state.favs.merge([...state.sharedIds]);
+      leaveShared('Übernommen – ' + state.favs.size() + ' Sets in deinem Plan.');
+    });
+    $('#ownplan').addEventListener('click', () => leaveShared(''));
+  }
+
+  function leaveShared(message) {
+    state.viewingShared = false;
+    state.sharedIds = null;
+    const el = $('#banner');
+    if (message) {
+      el.innerHTML = '<p>' + TT.escapeHtml(message) + '</p>';
+      setTimeout(() => { el.hidden = true; }, 4000);
+    } else {
+      el.hidden = true;
+    }
+    const u = new URL(location.href);
+    u.searchParams.delete('fav');
+    history.replaceState(null, '', u);
+    render({ keepScroll: true });
+  }
+
+  function flash(msg) {
+    const el = $('#banner');
+    el.hidden = false;
+    el.innerHTML = '<p>' + TT.escapeHtml(msg) + '</p>';
+    clearTimeout(flash._t);
+    flash._t = setTimeout(() => { el.hidden = true; }, 4500);
+  }
+
+  /* ---------- Tagesreiter ---------- */
+
+  function buildDayTabs() {
+    const box = $('#daytabs');
+    const ev = state.ev;
+    if (ev.days.length < 2) { box.hidden = true; return; }
+
+    box.innerHTML = '';
+    for (const d of ev.days) {
+      const b = document.createElement('button');
+      b.className = 'daytab';
+      b.type = 'button';
+      b.setAttribute('aria-pressed', String(d.id === state.dayId));
+      b.innerHTML = '<b>' + TT.escapeHtml(d.label || d.id) + '</b><span>' +
+        TT.escapeHtml(TT.fmtDayDate(d.date)) + '</span>';
+      b.addEventListener('click', () => {
+        state.dayId = d.id;
+        state.didAutoScroll = false;
+        [...box.children].forEach((c, i) =>
+          c.setAttribute('aria-pressed', String(ev.days[i].id === d.id)));
+        const u = new URL(location.href);
+        u.searchParams.set('d', d.id);
+        history.replaceState(null, '', u);
+        render();
+      });
+      box.appendChild(b);
+    }
+  }
+
+  /* ---------- Steuerung ---------- */
+
+  function wireControls() {
+    const gridBtn = $('#viewGrid'), listBtn = $('#viewList');
+    const syncView = () => {
+      gridBtn.setAttribute('aria-pressed', String(state.view === 'grid'));
+      listBtn.setAttribute('aria-pressed', String(state.view === 'list'));
+    };
+    const setView = (v) => {
+      state.view = v;
+      TT.writeStore(VIEW_KEY, v);
+      state.didAutoScroll = false;
+      syncView();
+      render();
+    };
+    gridBtn.addEventListener('click', () => setView('grid'));
+    listBtn.addEventListener('click', () => setView('list'));
+    syncView();
+
+    const input = $('#q');
+    input.addEventListener('input', () => {
+      state.query = input.value;
+      $('#qclear').hidden = !input.value;
+      render({ keepScroll: true });
+    });
+    $('#qclear').addEventListener('click', () => {
+      input.value = '';
+      state.query = '';
+      $('#qclear').hidden = true;
+      input.focus();
+      render({ keepScroll: true });
+    });
+
+    $('#onlyFavs').addEventListener('click', (e) => {
+      state.onlyFavs = !state.onlyFavs;
+      e.currentTarget.setAttribute('aria-pressed', String(state.onlyFavs));
+      render();
+    });
+
+    $('#share').addEventListener('click', openShare);
+  }
+
+  /* ---------- Teilen ---------- */
+
+  function openShare() {
+    const ids = [...activeIds()];
+    const dlg = $('#shareDlg');
+    const url = TT.shareUrl(state.ev.id, state.dayId, ids);
+
+    $('#shareInfo').textContent = ids.length
+      ? ids.length + ' markierte Sets. Der Link zeigt deinen Plan – Favoriten der Empfänger bleiben erhalten.'
+      : 'Du hast noch keine Sets markiert. Der Link zeigt dann nur den Timetable.';
+    $('#shareUrl').value = url;
+
+    const nativeBtn = $('#shareNative');
+    nativeBtn.hidden = !navigator.share;
+
+    dlg.showModal();
+    $('#shareUrl').select();
+
+    $('#shareCopy').onclick = async () => {
+      try {
+        await navigator.clipboard.writeText(url);
+        $('#shareCopy').textContent = 'Kopiert ✓';
+      } catch (e) {
+        $('#shareUrl').select();
+        document.execCommand && document.execCommand('copy');
+        $('#shareCopy').textContent = 'Kopiert ✓';
+      }
+      setTimeout(() => { $('#shareCopy').textContent = 'Kopieren'; }, 2000);
+    };
+    nativeBtn.onclick = () => navigator.share({ title: state.ev.name, url }).catch(() => {});
+  }
+
+  /* ---------- Rendern ---------- */
+
+  function visibleSets() {
+    const favIds = activeIds();
+    return state.ev.sets.filter((s) => {
+      if (s.day !== state.dayId || !s._start || !s._end) return false;
+      if (state.onlyFavs && !favIds.has(s.id)) return false;
+      return true;
+    });
+  }
+
+  function render(opts) {
+    const keepScroll = opts && opts.keepScroll;
+    const scroller = $('.grid-scroll');
+    const prevScroll = keepScroll && scroller ? scroller.scrollTop : null;
+
+    const sets = visibleSets();
+    const favCount = activeIds().size;
+    const btn = $('#onlyFavs');
+    btn.textContent = '★ Nur meine Sets' + (favCount ? ' (' + favCount + ')' : '');
+    btn.setAttribute('aria-pressed', String(state.onlyFavs));
+
+    const host = $('#view');
+
+    if (!sets.length) {
+      host.innerHTML = '<div class="empty">' + (
+        state.onlyFavs
+          ? 'Für diesen Tag hast du noch nichts markiert.<br><span class="faint">Sets antippen, um sie zu deinem Plan hinzuzufügen.</span>'
+          : 'Für diesen Tag sind noch keine Sets eingetragen.'
+      ) + '</div>';
+      updateCount(0, 0);
+      return;
+    }
+
+    const matching = sets.filter((s) => TT.matchesQuery(s, state.query));
+    updateCount(matching.length, sets.length);
+
+    if (state.view === 'grid') renderGrid(host, sets, matching);
+    else renderList(host, matching);
+
+    const newScroller = $('.grid-scroll');
+    if (prevScroll != null && newScroller) newScroller.scrollTop = prevScroll;
+    else if (state.view === 'grid') maybeScrollToNow();
+  }
+
+  function updateCount(shown, total) {
+    const el = $('#count');
+    if (!state.query) { el.textContent = total ? total + ' Sets' : ''; return; }
+    el.textContent = shown + ' von ' + total + ' Sets';
+  }
+
+  function setClasses(s, matching, now) {
+    const cls = ['set'];
+    if (isFav(s)) cls.push('fav');
+    if (s.status === 'cancelled') cls.push('cancelled');
+    if (now >= s._start && now <= s._end) cls.push('playing');
+    else if (s._end < now) cls.push('past');
+    if (state.query && !matching.has(s.id)) cls.push('dimmed');
+    if (s._dur <= 45) cls.push('short');
+    return cls;
+  }
+
+  function badges(s) {
+    let out = '';
+    if (s.status === 'cancelled') out += '<span class="badge cancelled">abgesagt</span>';
+    if (s.status === 'moved') out += '<span class="badge moved">verschoben</span>';
+    if (s.status === 'new') out += '<span class="badge new">neu</span>';
+    if (s.b2b) out += '<span class="badge b2b">b2b</span>';
+    return out;
+  }
+
+  // Floors, die in sets vorkommen, aber nicht in ev.floors deklariert sind.
+  function appendOrphanFloors(floors, ev, sets) {
+    const known = new Set(ev.floors.map((f) => f.id));
+    for (const s of sets) {
+      if (known.has(s.floor) || floors.some((f) => f.id === s.floor)) continue;
+      floors.push({ id: s.floor, name: s.floor || 'Ohne Floor' });
+    }
+  }
+
+  /* ---------- Raster ---------- */
+
+  function renderGrid(host, sets, matchingList) {
+    const ev = state.ev;
+    const matching = new Set(matchingList.map((s) => s.id));
+    const now = new Date();
+    const ppm = parseFloat(getComputedStyle(document.documentElement)
+      .getPropertyValue('--ppm')) || 1.6;
+
+    const floors = ev.floors.filter((f) => sets.some((s) => s.floor === f.id));
+    // Sets auf einem unbekannten Floor gehen sonst still verloren.
+    appendOrphanFloors(floors, ev, sets);
+
+    const minStart = new Date(Math.min(...sets.map((s) => +s._start)));
+    const maxEnd = new Date(Math.max(...sets.map((s) => +s._end)));
+    const from = new Date(minStart); from.setMinutes(0, 0, 0);
+    const to = new Date(maxEnd);
+    if (to.getMinutes() || to.getSeconds()) { to.setMinutes(0, 0, 0); to.setHours(to.getHours() + 1); }
+
+    const totalMin = Math.max(60, (to - from) / 6e4);
+    const height = totalMin * ppm;
+    const topOf = (d) => ((d - from) / 6e4) * ppm;
+
+    const head = floors.map((f) =>
+      '<div class="floorname" style="--floor:' + TT.escapeHtml(f.color || 'var(--accent)') + '">' +
+      TT.escapeHtml(f.name || f.id) + '</div>').join('');
+
+    let ticks = '', lines = '';
+    for (let m = 0; m <= totalMin; m += 30) {
+      const t = new Date(+from + m * 6e4);
+      const y = m * ppm;
+      const onHour = t.getMinutes() === 0;
+      if (onHour) ticks += '<div class="tick" style="top:' + y + 'px">' + TT.fmtTime(t) + '</div>';
+      lines += '<div class="hourline' + (onHour ? '' : ' halfline') + '" style="top:' + y + 'px"></div>';
+    }
+
+    const lanesHtml = floors.map((f) => {
+      const mine = sets.filter((s) => s.floor === f.id)
+        .sort((a, b) => a._start - b._start);
+      TT.packLanes(mine);
+
+      const blocks = mine.map((s) => {
+        const w = 100 / (s._laneCount || 1);
+        const style = [
+          'top:' + topOf(s._start) + 'px',
+          'height:' + Math.max(20, s._dur * ppm - 3) + 'px',
+          'left:' + (s._lane * w) + '%',
+          'width:calc(' + w + '% - 4px)',
+          '--floor:' + (f.color || 'var(--accent)'),
+        ].join(';');
+
+        return '<button type="button" class="' + setClasses(s, matching, now).join(' ') + '" ' +
+          'style="' + TT.escapeHtml(style) + '" data-set="' + TT.escapeHtml(s.id) + '" ' +
+          'aria-pressed="' + isFav(s) + '">' +
+          '<span class="artist">' + TT.escapeHtml(s.artist) + badges(s) + '</span>' +
+          '<span class="time">' + TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end) + '</span>' +
+          (s.genre ? '<span class="meta">' + TT.escapeHtml(s.genre) + '</span>' : '') +
+          '</button>';
+      }).join('');
+
+      return '<div class="lane" data-floor="' + TT.escapeHtml(f.id) + '">' + lines + blocks + '</div>';
+    }).join('');
+
+    const showNow = now >= from && now <= to;
+    const nowHtml = showNow
+      ? '<div class="nowline" id="nowline" style="top:' + topOf(now) + 'px"></div>'
+      : '';
+
+    host.innerHTML =
+      '<div class="grid-scroll">' +
+        '<div class="grid-head"><div class="corner"></div>' + head + '</div>' +
+        // +22px = Innenabstand aus dem CSS, damit 1 Minute wirklich --ppm Pixel bleibt
+        '<div class="grid-body" style="height:' + (height + 22) + 'px">' +
+          '<div class="axis">' + ticks + '</div>' +
+          '<div class="lanes">' + lanesHtml + nowHtml + '</div>' +
+        '</div>' +
+      '</div>';
+
+  }
+
+  function maybeScrollToNow() {
+    if (state.didAutoScroll) return;
+    const line = $('#nowline'), scroller = $('.grid-scroll');
+    if (!line || !scroller) return;
+    state.didAutoScroll = true;
+    // offsetTop zaehlt ab .lanes, nicht ab der Scrollbox – darum ueber die Rects messen.
+    const delta = line.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+    scroller.scrollTop = Math.max(0, scroller.scrollTop + delta - scroller.clientHeight * 0.3);
+  }
+
+  /* ---------- Liste ---------- */
+
+  function renderList(host, sets) {
+    const ev = state.ev;
+    const now = new Date();
+    const floors = ev.floors.filter((f) => sets.some((s) => s.floor === f.id));
+    appendOrphanFloors(floors, ev, sets);
+
+    if (!sets.length) {
+      host.innerHTML = '<div class="empty">Keine Treffer für „' +
+        TT.escapeHtml(state.query) + '“.</div>';
+      return;
+    }
+
+    host.innerHTML = '<div class="list">' + floors.map((f) => {
+      const mine = sets.filter((s) => s.floor === f.id).sort((a, b) => a._start - b._start);
+      const rows = mine.map((s) => {
+        const cls = ['row'];
+        if (isFav(s)) cls.push('fav');
+        if (s.status === 'cancelled') cls.push('cancelled');
+        if (now >= s._start && now <= s._end) cls.push('playing');
+        else if (s._end < now) cls.push('past');
+
+        const meta = [TT.fmtDuration(s._dur), s.genre, s.note].filter(Boolean).join(' · ');
+        return '<button type="button" class="' + cls.join(' ') + '" ' +
+          'style="--floor:' + TT.escapeHtml(f.color || 'var(--accent)') + '" ' +
+          'data-set="' + TT.escapeHtml(s.id) + '" aria-pressed="' + isFav(s) + '">' +
+          '<span class="when"><b>' + TT.fmtTime(s._start) + '</b>' + TT.fmtTime(s._end) + '</span>' +
+          '<span class="body"><span class="artist">' + TT.escapeHtml(s.artist) + badges(s) + '</span>' +
+          (meta ? '<span class="meta">' + TT.escapeHtml(meta) + '</span>' : '') + '</span>' +
+          '<span class="star">' + (isFav(s) ? '★' : '☆') + '</span>' +
+          '</button>';
+      }).join('');
+
+      return '<section class="list-floor" style="--floor:' +
+        TT.escapeHtml(f.color || 'var(--accent)') + '">' +
+        '<h2>' + TT.escapeHtml(f.name || f.id) +
+        ' <span class="count">' + mine.length + '</span></h2>' + rows + '</section>';
+    }).join('') + '</div>';
+
+  }
+
+  /* ---------- Uhr ---------- */
+
+  function tickClock() {
+    const el = $('#clock');
+    const now = new Date();
+    el.textContent = TT.fmtTime(now);
+
+    const sets = state.ev ? TT.setsForDay(state.ev, state.dayId) : [];
+    const live = sets.length &&
+      now >= new Date(Math.min(...sets.map((s) => +s._start))) &&
+      now <= new Date(Math.max(...sets.map((s) => +s._end)));
+    el.classList.toggle('live', !!live);
+
+    const line = $('#nowline');
+    if (line && sets.length) {
+      const ppm = parseFloat(getComputedStyle(document.documentElement)
+        .getPropertyValue('--ppm')) || 1.6;
+      const from = new Date(Math.min(...sets.map((s) => +s._start)));
+      from.setMinutes(0, 0, 0);
+      line.style.top = (((now - from) / 6e4) * ppm) + 'px';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+})();

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0c0d12">
+<title>Timetables</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="topbar-row">
+      <div class="brand"><h1>Timetables</h1></div>
+      <span class="clock" id="clock">--:--</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <p class="muted" style="margin:18px 0">
+    Event auswählen, Sets antippen – dein Plan wird in diesem Browser gespeichert.
+  </p>
+  <div id="list"><p class="faint">Lade…</p></div>
+</main>
+
+<footer class="wrap footer">
+  <p><a href="admin.html">Timetable bearbeiten</a> · Favoriten liegen pro Browser lokal, nichts wird hochgeladen.</p>
+</footer>
+
+<script src="assets/core.js"></script>
+<script>
+(function () {
+  'use strict';
+  const clock = document.getElementById('clock');
+  const tick = () => { clock.textContent = TT.fmtTime(new Date()); };
+  tick();
+  setInterval(tick, 15000);
+
+  function dateRange(ev) {
+    if (!ev.days.length) return '';
+    const first = TT.fmtDayDate(ev.days[0].date);
+    const last = TT.fmtDayDate(ev.days[ev.days.length - 1].date);
+    return ev.days.length > 1 ? first + ' – ' + last : first;
+  }
+
+  (async function render() {
+    const host = document.getElementById('list');
+    let files;
+    try {
+      files = await TT.loadManifest();
+    } catch (err) {
+      host.innerHTML = '<div class="error">data/events.json konnte nicht geladen werden: ' +
+        TT.escapeHtml(err.message) +
+        '<br><span class="faint">Beim lokalen Testen einen kleinen Webserver nutzen – ' +
+        'per Doppelklick geöffnete Dateien dürfen kein JSON laden.</span></div>';
+      return;
+    }
+
+    const results = await Promise.all(files.map(async (f) => {
+      try { return await TT.loadEventFile(f); }
+      catch (err) { return { _error: f + ': ' + err.message }; }
+    }));
+
+    const events = results.filter((r) => !r._error);
+    const errors = results.filter((r) => r._error);
+
+    if (!events.length) {
+      host.innerHTML = '<div class="empty">Noch keine Events eingetragen.<br>' +
+        '<span class="faint">Eine JSON-Datei in <code>data/</code> anlegen und in ' +
+        '<code>data/events.json</code> eintragen.</span></div>';
+    } else {
+      // Kommende Events zuerst, vergangene nach hinten.
+      const endOf = (ev) => ev.sets.length ? Math.max(...ev.sets.map((s) => +s._end || 0)) : 0;
+      const now = Date.now();
+      events.sort((a, b) => {
+        const pa = endOf(a) < now, pb = endOf(b) < now;
+        if (pa !== pb) return pa ? 1 : -1;
+        return endOf(a) - endOf(b);
+      });
+
+      host.innerHTML = '<div class="cards">' + events.map((ev) => {
+        const favs = TT.readStore('tt.fav.' + ev.id, []).length;
+        const past = endOf(ev) < now;
+        const pills = [
+          ev.days.length + (ev.days.length === 1 ? ' Tag' : ' Tage'),
+          ev.floors.length + (ev.floors.length === 1 ? ' Floor' : ' Floors'),
+          ev.sets.filter((s) => s.status !== 'cancelled').length + ' Sets',
+        ].map((t) => '<span class="pill">' + TT.escapeHtml(t) + '</span>').join('');
+
+        return '<a class="card" href="event.html?e=' + encodeURIComponent(ev.id) + '">' +
+          '<h2>' + TT.escapeHtml(ev.name) + '</h2>' +
+          '<div class="when">' + TT.escapeHtml(dateRange(ev)) +
+          (ev.venue ? ' · ' + TT.escapeHtml(ev.venue) : '') +
+          (past ? ' · vorbei' : '') + '</div>' +
+          '<div class="pills">' + pills +
+          (favs ? '<span class="pill favcount">★ ' + favs + ' markiert</span>' : '') +
+          '</div></a>';
+      }).join('') + '</div>';
+    }
+
+    if (errors.length) {
+      host.insertAdjacentHTML('beforeend',
+        '<div class="error" style="margin-top:14px">Nicht ladbar:<br>' +
+        errors.map((e) => TT.escapeHtml(e._error)).join('<br>') + '</div>');
+    }
+  })();
+})();
+</script>
+</body>
+</html>
