@@ -16,7 +16,6 @@ Kein Server, keine Datenbank, keine Anmeldung.
 ```
 index.html      Übersicht aller Events
 event.html      Timetable eines Events   (?e=<event-id>&d=<tag-id>&fav=<ids>)
-admin.html      Editor für Last-Minute-Änderungen (erzeugt JSON, schreibt nichts)
 assets/         core.js (Logik), event.js (Ansicht), export.js (Bild/PDF/Backup), style.css
 data/events.json          Liste der Event-Dateien
 data/<event-id>.json      ein Event
@@ -67,21 +66,37 @@ Die Beispieldatei `demo-festival-2026.json` ist erfunden – löschen, sobald ec
 
 ## Last-Minute-Änderungen
 
-`admin.html` öffnen → Event laden → ändern → **„JSON kopieren“** → auf GitHub
-`data/<event-id>.json` öffnen, Stift-Symbol, Inhalt ersetzen, „Commit changes“. Geht auch vom Handy.
+Alles läuft über den GitHub-Web-Editor – geht auch vom Handy:
 
-Der Editor hilft bei genau den Fällen, die nachts auftreten:
+1. **https://github.com/rbnsch/timetables** → `data/` → die Event-Datei antippen
+2. Stift-Symbol oben rechts
+3. Ändern → **Commit changes**
+4. Nach ~30 Sekunden ist es live
 
-| Situation | Vorgehen |
+### Notfall-Spickzettel
+
+Ein Set sieht im JSON so aus:
+
+```json
+{ "id": "tc05", "day": "d1", "floor": "colosseum", "artist": "KOBOSIL", "start": "21:00", "end": "22:30" },
+```
+
+| Situation | Was ändern |
 |---|---|
-| DJ fällt aus | Status auf **abgesagt** – Set bleibt sichtbar und durchgestrichen, statt spurlos zu verschwinden |
-| Set wird länger/kürzer | Endzeit ändern, dann **⇩ anschließen** – das nächste Set auf dem Floor rückt automatisch nach |
-| Act kommt dazu | **+ Set**, Name und Zeiten eintragen |
-| Floor/Tag fehlt | **+ Floor** bzw. **+ Tag** |
+| **DJ fällt aus** | `"status": "cancelled"` vor der schließenden Klammer ergänzen. Das Set bleibt durchgestrichen stehen, statt spurlos zu verschwinden – so sehen alle, dass der Slot tot ist. |
+| **Set wird länger** | `"end"` erhöhen. Und beim **nächsten** Set auf demselben Floor `"start"` gleich mitziehen, sonst überlappen sie. |
+| **Act kommt dazu** | Ganze Zeile kopieren, einfügen, `"id"` auf etwas Neues ändern (z.B. `"tc99"`), Rest anpassen. |
+| **Umbenennung** | Nur `"artist"` ändern. Die `id` **nicht** anfassen – sonst verlieren alle ihre Markierung. |
 
-Unter der Tabelle läuft eine Plausibilitätsprüfung mit: Überschneidungen auf einem Floor,
-doppelte IDs, fehlende Namen, unsinnige Zeiten. **„Vorschau öffnen“** zeigt den Stand so,
-wie er nach dem Commit aussähe – ohne dass ihn schon jemand sieht.
+### Die drei Fallen im JSON
+
+1. **Komma am Zeilenende** – jede Set-Zeile endet mit `,`, nur die letzte vor der `]` nicht.
+2. **Anführungszeichen** – alle Werte in `"..."`, auch Uhrzeiten: `"start": "23:00"`, nicht `23:00`.
+3. **Zeiten über Mitternacht** – einfach `"01:30"` schreiben. Dank `dayBoundaryHour` landet das automatisch auf dem Folgetag; kein Datum nötig.
+
+GitHub prüft die Syntax nicht. Wenn nach dem Commit auf der Seite *„Timetable konnte nicht geladen werden"* steht, ist meist ein Komma zu viel oder zu wenig im Spiel. Dann hilft **History → vorherige Version → Revert**, und du bist in 30 Sekunden zurück im funktionierenden Zustand.
+
+> Zum Gegenprüfen vor dem Commit: Text in einen JSON-Validator wie <https://jsonlint.com> einfügen. Der zeigt die fehlerhafte Zeile an.
 
 ### Die eine Regel: Set-IDs nie ändern
 
@@ -152,9 +167,7 @@ Das Backup enthält nur Set-IDs, keine Namen:
 Ändern kann den Timetable **nur, wer Schreibrechte auf das GitHub-Repository hat** – also du.
 Die Seite selbst hat kein Backend und keine Schreib-Schnittstelle; Besucher laden nur fertige Dateien.
 
-`admin.html` ist **kein** Hintertürchen: Die Seite liest JSON, lässt dich damit herumspielen und
-spuckt am Ende Text aus. Sie schreibt nichts auf den Server. Wenn ein Freund dort etwas ändert,
-sieht er das nur in seinem eigenen Browser – nach einem Reload ist es weg.
+Es gibt auf der Seite keinerlei Bearbeitungsfunktion – weder sichtbar noch versteckt.
 
 Ebenso sind Markierungen **pro Browser**: Niemand kann die Favoriten eines anderen verändern,
 auch nicht über einen Teilen-Link (der schlägt nur vor, zu übernehmen).

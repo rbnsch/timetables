@@ -15,7 +15,6 @@
     sharedIds: null,     // IDs aus einem geteilten Link
     viewingShared: false,
     didAutoScroll: false,
-    isDraft: false,
   };
 
   const VIEW_KEY = 'tt.view';
@@ -26,18 +25,11 @@
     const id = params.get('e');
     if (!id) return fail('Kein Event angegeben. <a href="index.html">Zur Übersicht</a>');
 
-    // Vorschau aus dem Admin-Editor: Entwurf aus localStorage statt der veroeffentlichten Datei.
-    const draft = params.get('draft') === '1' ? TT.readStore('tt.draft', null) : null;
-    if (draft && draft.id === id) {
-      state.ev = TT.prepare(draft);
-      state.isDraft = true;
-    } else {
-      try {
-        state.ev = await TT.loadEventById(id);
-      } catch (err) {
-        return fail('Timetable konnte nicht geladen werden: ' + TT.escapeHtml(err.message) +
-          '<br><a href="index.html">Zur Übersicht</a>');
-      }
+    try {
+      state.ev = await TT.loadEventById(id);
+    } catch (err) {
+      return fail('Timetable konnte nicht geladen werden: ' + TT.escapeHtml(err.message) +
+        '<br><a href="index.html">Zur Übersicht</a>');
     }
 
     const ev = state.ev;
@@ -54,14 +46,6 @@
       state.sharedIds = new Set(validShared);
       state.viewingShared = true;
       showSharedBanner(validShared.length, shared.length - validShared.length);
-    }
-
-    if (state.isDraft && !state.viewingShared) {
-      const el = $('#banner');
-      el.hidden = false;
-      el.innerHTML = '<p><strong>Vorschau</strong> – unveröffentlichter Entwurf aus dem Editor. ' +
-        'Erst nach dem Commit sehen andere diesen Stand.</p>' +
-        '<a class="btn sm ghost" href="admin.html">Zurück zum Editor</a>';
     }
 
     const wantedDay = params.get('d');
