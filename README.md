@@ -147,8 +147,8 @@ festhalten, dass man nur einen Teil davon mitnimmt:
 
 1. Set antippen → markiert
 2. Auf den **★** in der Ecke tippen
-3. **Erste Hälfte** / **Zweite Hälfte** / **Erste 30 Min** / **Letzte 30 Min** – oder die Dropdowns
-   für „von“ und „bis“ in 15-Minuten-Schritten
+3. **Erste Hälfte** / **Zweite Hälfte** / **Erste 30 Min** / **Letzte 30 Min** als Abkürzung –
+   oder „von“ und „bis“ **minutengenau** eintippen (am Handy öffnet sich die Uhr-Auswahl)
 4. **Übernehmen**
 
 Im Raster bleibt der gewählte Ausschnitt hell, der Rest des Blocks wird abgedunkelt – man sieht also
@@ -156,6 +156,10 @@ auf einen Blick, wann man rübergeht. In der Liste steht die verkürzte Zeit, da
 **Ganzes Set** macht die Einschränkung wieder rückgängig.
 
 Teilbesuche landen im Teilen-Link, im Backup und in beiden Exporten (Bild und PDF).
+
+Zeiten außerhalb des Sets werden automatisch auf dessen Anfang bzw. Ende begrenzt, und „bis“
+rutscht nach, falls es vor „von“ landet. Uhrzeiten nach Mitternacht funktionieren wie überall
+sonst auf der Seite.
 
 > Gespeichert werden **Minuten ab Set-Beginn**, keine Uhrzeiten. Verschiebt sich ein Set später um
 > eine halbe Stunde, bleibt „erste Hälfte“ weiterhin die erste Hälfte. Wird es kürzer, wird die

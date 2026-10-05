@@ -350,60 +350,76 @@
       TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end) +
       (floor ? ' · ' + (floor.name || floor.id) : '');
 
-    fillPartOptions($('#partFrom'), s);
-    fillPartOptions($('#partTo'), s);
-    $('#partFrom').value = String(snapToOption($('#partFrom'), cur.from));
-    $('#partTo').value = String(snapToOption($('#partTo'), cur.to));
-
+    writePartInputs(cur.from, cur.to);
     syncPartInfo();
     $('#partDlg').showModal();
   }
 
-  function partStep(dur) { return dur > 240 ? 30 : 15; }
+  // Offsets (Minuten ab Set-Beginn) <-> "HH:MM" im Zeitfeld.
+  const offsetToClock = (s, min) => TT.fmtTime(new Date(+s._start + min * 6e4));
 
-  function fillPartOptions(sel, s) {
-    const dur = s._dur, step = partStep(dur);
-    let html = '';
-    for (let m = 0; m <= dur; m += step) {
-      html += '<option value="' + m + '">' +
-        TT.fmtTime(new Date(+s._start + m * 6e4)) + '</option>';
-    }
-    // Das echte Set-Ende aufnehmen, falls die Dauer kein Vielfaches des Schritts ist
-    if (dur % step) html += '<option value="' + dur + '">' + TT.fmtTime(s._end) + '</option>';
-    sel.innerHTML = html;
+  // Beruecksichtigt den Tageswechsel: bei einem Set 23:00-01:00 gehoert "00:30" zum Folgetag.
+  function clockToOffset(s, value) {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(value || '');
+    if (!m) return null;
+    const d = new Date(s._start);
+    d.setHours(+m[1], +m[2], 0, 0);
+    const diff = Math.round((d - s._start) / 6e4);
+    // Eine Uhrzeit kann denselben Abend zweimal meinen (22:30-Set, Eingabe "03:00").
+    // Darum die Variante nehmen, die dem Set am naechsten liegt – so landet "21:00"
+    // am Anfang und "03:00" am Ende, statt jeweils am falschen Rand.
+    const abstand = (x) => (x < 0 ? -x : (x > s._dur ? x - s._dur : 0));
+    const alt = diff + (diff < 0 ? 1440 : -1440);
+    return abstand(alt) < abstand(diff) ? alt : diff;
   }
 
-  // Auf den nächstgelegenen vorhandenen Wert runden, damit select.value nie ins Leere greift.
-  function snapToOption(sel, minutes) {
-    const vals = [...sel.options].map((o) => +o.value);
-    return vals.reduce((best, v) =>
-      Math.abs(v - minutes) < Math.abs(best - minutes) ? v : best, vals[0]);
+  // Liest beide Felder, begrenzt auf das Set und sorgt dafuer, dass "bis" nach "von" liegt.
+  function readPartInputs() {
+    const dur = partTarget._dur;
+    const raw = {
+      from: clockToOffset(partTarget, $('#partFrom').value),
+      to: clockToOffset(partTarget, $('#partTo').value),
+    };
+
+    let from = raw.from == null ? 0 : raw.from;
+    let to = raw.to == null ? dur : raw.to;
+    const ausserhalb = (raw.from != null && (raw.from < 0 || raw.from > dur)) ||
+                       (raw.to != null && raw.to > dur);
+
+    from = Math.max(0, Math.min(from, Math.max(0, dur - 1)));
+    to = Math.max(0, Math.min(to, dur));
+    if (to <= from) to = Math.min(dur, from + 1);
+
+    return { from, to, dur, ausserhalb };
   }
 
-  function syncPartInfo() {
+  function writePartInputs(from, to) {
+    $('#partFrom').value = offsetToClock(partTarget, from);
+    $('#partTo').value = offsetToClock(partTarget, to);
+  }
+
+  function syncPartInfo(korrigieren) {
     if (!partTarget) return;
-    const dur = partTarget._dur, step = partStep(dur);
-    let from = +$('#partFrom').value;
-    let to = +$('#partTo').value;
-
-    // „bis“ darf nie vor „von“ liegen – still nachziehen statt meckern.
-    if (to <= from) {
-      to = snapToOption($('#partTo'), Math.min(from + step, dur));
-      if (to <= from) { from = snapToOption($('#partFrom'), Math.max(0, to - step)); }
-      $('#partFrom').value = String(from);
-      $('#partTo').value = String(to);
-    }
+    const { from, to, dur, ausserhalb } = readPartInputs();
+    if (korrigieren) writePartInputs(from, to);
 
     const ganz = from <= 0 && to >= dur;
-    $('#partInfo').textContent = ganz
+    const hinweis = ausserhalb
+      ? ' Auf die Set-Zeiten begrenzt.'
+      : '';
+    $('#partInfo').textContent = (ganz
       ? 'Das ist das ganze Set (' + TT.fmtDuration(dur) + ').'
       : TT.fmtDuration(to - from) + ' von ' + TT.fmtDuration(dur) +
-        ' · du verpasst ' + TT.fmtDuration(dur - (to - from)) + '.';
+        ' · du verpasst ' + TT.fmtDuration(dur - (to - from)) + '.') + hinweis;
   }
 
   function wirePartialDialog() {
-    $('#partFrom').addEventListener('change', syncPartInfo);
-    $('#partTo').addEventListener('change', syncPartInfo);
+    // Beim Tippen nur rechnen, erst beim Verlassen des Feldes korrigieren –
+    // sonst springt einem die halb eingetippte Zeit unter den Fingern weg.
+    $('#partFrom').addEventListener('input', () => syncPartInfo(false));
+    $('#partTo').addEventListener('input', () => syncPartInfo(false));
+    $('#partFrom').addEventListener('blur', () => syncPartInfo(true));
+    $('#partTo').addEventListener('blur', () => syncPartInfo(true));
 
     for (const b of document.querySelectorAll('#partDlg [data-preset]')) {
       b.addEventListener('click', () => {
@@ -418,9 +434,8 @@
         };
         const r = ranges[b.dataset.preset];
         if (!r) return;
-        $('#partFrom').value = String(snapToOption($('#partFrom'), r[0]));
-        $('#partTo').value = String(snapToOption($('#partTo'), r[1]));
-        syncPartInfo();
+        writePartInputs(r[0], r[1]);
+        syncPartInfo(true);
       });
     }
 
@@ -432,8 +447,7 @@
 
     $('#partSave').addEventListener('click', () => {
       if (!partTarget) return;
-      const dur = partTarget._dur;
-      const from = +$('#partFrom').value, to = +$('#partTo').value;
+      const { from, to, dur } = readPartInputs();
       if (from <= 0 && to >= dur) state.parts.clear(partTarget.id);
       else state.parts.set(partTarget.id, from, to);
       $('#partDlg').close();

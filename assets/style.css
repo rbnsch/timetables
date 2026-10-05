@@ -567,7 +567,7 @@ dialog .partpresets { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 4
 dialog .partrow { display: flex; gap: 12px; margin: 12px 0 4px; }
 dialog .partrow .field { flex: 1 1 0; display: flex; flex-direction: column; gap: 4px;
                          font-size: 12px; color: var(--fg-dim); }
-dialog .partrow select {
+dialog .partrow input[type="time"] {
   padding: 10px 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
