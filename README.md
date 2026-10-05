@@ -58,11 +58,13 @@ Jeder weitere `git push` (oder jede Änderung über den Web-Editor) ist nach ~30
 `data/<event-id>.json` an und trage die Datei in `data/events.json` ein. Hilfreich dabei:
 Datum der Tage und wie die Floors heißen, falls das Bild das nicht hergibt.
 
-**Von Hand:** eine Datei nach dem Muster von `data/demo-festival-2026.json` anlegen und
+**Von Hand:** eine Datei nach dem Muster von `data/hive-indoor-2026.json` anlegen und
 den Dateinamen in `data/events.json` ergänzen.
 
-Die Beispieldatei `demo-festival-2026.json` ist erfunden – löschen, sobald echte Events drin sind
-(dann auch den Eintrag aus `events.json` entfernen).
+> **Achtung beim Teilen:** `index.html` listet *alle* Events aus `events.json` auf. Sobald dort ein
+> zweites Event steht, kann jeder, der einen Event-Link hat, über die Startseite auch die anderen
+> finden. Wer das nicht will, trägt neue Events nicht in `events.json` ein – sie bleiben dann über
+> ihren direkten Link erreichbar, tauchen aber in keiner Liste auf.
 
 ## Last-Minute-Änderungen
 

@@ -23,13 +23,12 @@
 
   async function init() {
     const id = params.get('e');
-    if (!id) return fail('Kein Event angegeben. <a href="index.html">Zur Übersicht</a>');
+    if (!id) return fail('Kein Event angegeben.');
 
     try {
       state.ev = await TT.loadEventById(id);
     } catch (err) {
-      return fail('Timetable konnte nicht geladen werden: ' + TT.escapeHtml(err.message) +
-        '<br><a href="index.html">Zur Übersicht</a>');
+      return fail('Timetable konnte nicht geladen werden: ' + TT.escapeHtml(err.message));
     }
 
     const ev = state.ev;
