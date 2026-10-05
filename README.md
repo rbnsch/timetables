@@ -17,7 +17,7 @@ Kein Server, keine Datenbank, keine Anmeldung.
 index.html      Übersicht aller Events
 event.html      Timetable eines Events   (?e=<event-id>&d=<tag-id>&fav=<ids>)
 admin.html      Editor für Last-Minute-Änderungen (erzeugt JSON, schreibt nichts)
-assets/         core.js (Logik), event.js (Ansicht), style.css
+assets/         core.js (Logik), event.js (Ansicht), export.js (Bild/PDF/Backup), style.css
 data/events.json          Liste der Event-Dateien
 data/<event-id>.json      ein Event
 ```
