@@ -26,10 +26,17 @@
 </main>
 
 <footer class="wrap footer">
+  <div class="bar" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+    <button type="button" class="btn sm ghost" id="backup">Backup speichern</button>
+    <button type="button" class="btn sm ghost" id="restore">Backup laden…</button>
+    <input type="file" id="restoreFile" accept="application/json,.json" hidden>
+    <span class="faint" id="backupMsg" aria-live="polite"></span>
+  </div>
   <p><a href="admin.html">Timetable bearbeiten</a> · Favoriten liegen pro Browser lokal, nichts wird hochgeladen.</p>
 </footer>
 
 <script src="assets/core.js"></script>
+<script src="assets/export.js"></script>
 <script>
 (function () {
   'use strict';
@@ -37,6 +44,35 @@
   const tick = () => { clock.textContent = TT.fmtTime(new Date()); };
   tick();
   setInterval(tick, 15000);
+
+  const msg = (t) => { document.getElementById('backupMsg').textContent = t; };
+
+  document.getElementById('backup').addEventListener('click', () => {
+    const res = TTExport.downloadBackup();
+    msg(res.sets
+      ? 'Gespeichert: ' + res.sets + ' Sets aus ' + res.events + ' Event(s).'
+      : 'Noch keine Markierungen vorhanden.');
+  });
+
+  document.getElementById('restore').addEventListener('click',
+    () => document.getElementById('restoreFile').click());
+
+  document.getElementById('restoreFile').addEventListener('change', async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const data = await TTExport.readBackup(file);
+      const count = Object.values(data.favorites).reduce((n, a) => n + (a || []).length, 0);
+      const replace = confirm('Backup mit ' + count + ' markierten Sets.\n\n' +
+        'OK = bestehende Markierungen ERSETZEN\nAbbrechen = ZUSAMMENFÜHREN');
+      const res = TTExport.applyBackup(data, replace ? 'replace' : 'merge');
+      msg('Eingespielt: ' + res.sets + ' Sets in ' + res.events + ' Event(s).');
+      setTimeout(() => location.reload(), 900);
+    } catch (err) {
+      msg('Ging nicht: ' + err.message);
+    }
+  });
 
   function dateRange(ev) {
     if (!ev.days.length) return '';

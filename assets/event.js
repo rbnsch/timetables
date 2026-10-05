@@ -227,6 +227,84 @@
     });
 
     $('#share').addEventListener('click', openShare);
+    $('#export').addEventListener('click', openExport);
+    wireExport();
+  }
+
+  /* ---------- Export ---------- */
+
+  function openExport() {
+    const n = activeIds().size;
+    $('#exportInfo').textContent = n
+      ? n + ' markierte Sets insgesamt. Bild und Druck zeigen den gerade gewählten Tag.'
+      : 'Noch nichts markiert – Bild und Druck zeigen dann den Timetable ohne Hervorhebungen.';
+    $('#exportMsg').textContent = '';
+    $('#exportDlg').showModal();
+  }
+
+  const exportMsg = (text) => { $('#exportMsg').textContent = text; };
+
+  function wireExport() {
+    $('#expPng').addEventListener('click', async () => {
+      exportMsg('Bild wird erzeugt…');
+      try {
+        const res = await TTExport.pngForDay(state.ev, state.dayId, activeIds());
+        exportMsg('Bild gespeichert (' + res.width + '×' + res.height + ' px, ' +
+          res.favCount + ' markiert).');
+      } catch (err) {
+        exportMsg('Ging nicht: ' + err.message);
+      }
+    });
+
+    // Der Druck nutzt die Bildschirmansicht – im Raster wird das Ergebnis am ehesten
+    // zu dem, was man erwartet, darum vorher dorthin wechseln.
+    $('#expPdf').addEventListener('click', () => {
+      $('#exportDlg').close();
+      setTimeout(() => TTExport.printPlan(), 120);
+    });
+
+    $('#expBackup').addEventListener('click', () => {
+      const res = TTExport.downloadBackup();
+      exportMsg(res.sets
+        ? 'Backup gespeichert: ' + res.sets + ' Sets aus ' + res.events + ' Event(s).'
+        : 'Es gibt noch keine Markierungen zum Sichern.');
+    });
+
+    $('#expRestore').addEventListener('click', () => $('#restoreFile').click());
+
+    $('#restoreFile').addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      try {
+        const data = await TTExport.readBackup(file);
+        const count = Object.values(data.favorites).reduce((n, a) => n + (a || []).length, 0);
+        const replace = confirm(
+          'Backup mit ' + count + ' markierten Sets aus ' +
+          Object.keys(data.favorites).length + ' Event(s).\n\n' +
+          'OK = bestehende Markierungen ERSETZEN\n' +
+          'Abbrechen = mit vorhandenen ZUSAMMENFÜHREN');
+        const res = TTExport.applyBackup(data, replace ? 'replace' : 'merge');
+        exportMsg('Eingespielt: ' + res.sets + ' Sets in ' + res.events + ' Event(s).');
+        state.favs = TT.makeFavourites(state.ev.id);
+        render({ keepScroll: true });
+      } catch (err) {
+        exportMsg('Ging nicht: ' + err.message);
+      }
+    });
+  }
+
+  // Beim Drucken ist die Kopfleiste ausgeblendet – diese Zeile ersetzt sie auf dem Papier.
+  function updatePrintHead() {
+    const day = state.ev.days.find((d) => d.id === state.dayId);
+    const n = activeIds().size;
+    $('#printhead').innerHTML =
+      '<h1>' + TT.escapeHtml(state.ev.name) + '</h1>' +
+      '<div class="sub">' + TT.escapeHtml(
+        [day && day.label, day && day.date ? TT.fmtDayDate(day.date) : '', state.ev.venue]
+          .filter(Boolean).join(' · ')) + '</div>' +
+      (n ? '<div class="legend"><b>★ hervorgehoben</b> = mein Plan · ' +
+           'ausgegraute Sets laufen parallel</div>' : '');
   }
 
   /* ---------- Teilen ---------- */
@@ -284,6 +362,7 @@
     btn.setAttribute('aria-pressed', String(state.onlyFavs));
 
     const host = $('#view');
+    updatePrintHead();
 
     if (!sets.length) {
       host.innerHTML = '<div class="empty">' + (

@@ -512,6 +512,17 @@ dialog .sharebox input {
   font-size: 13px;
 }
 dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+dialog .exportrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+dialog .exportrow:last-of-type { border-bottom: 0; }
+dialog .exportrow .btn { flex: 0 0 auto; min-width: 150px; justify-content: center; }
+dialog .exportrow .faint { flex: 1 1 auto; line-height: 1.35; }
+dialog#exportDlg { max-width: 520px; }
 
 .footer {
   padding: 28px 0 40px;
@@ -528,7 +539,49 @@ dialog .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top
   .row .when { flex-basis: 62px; }
 }
 
+/* Nur im Druck sichtbarer Kopf (Bildschirmkopf ist dann ausgeblendet) */
+.printonly { display: none; }
+
 @media print {
-  .topbar, .controls, .daytabs, .banner, .footer { display: none; }
-  .set.dimmed, .row.dimmed { display: none; }
+  @page { margin: 10mm; }
+
+  /* Heller Druck statt Clubschwarz – spart Toner und liest sich auf Papier */
+  :root {
+    --bg: #fff; --bg-raised: #fff; --bg-sunken: #fff;
+    --line: #b4b4b4; --line-soft: #e2e2e2;
+    --fg: #111; --fg-dim: #4a4a4a; --fg-faint: #6e6e6e;
+    --accent: #000;
+  }
+  html, body { background: #fff; color: #111; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  .topbar, .controls, .daytabs, .banner, .footer, dialog { display: none !important; }
+  .printonly { display: block; margin: 0 0 10px; }
+  .printonly h1 { margin: 0; font-size: 17px; }
+  .printonly .sub { font-size: 12px; color: #555; }
+  .printonly .legend { margin-top: 6px; font-size: 11px; color: #555; }
+  .printonly .legend b { display: inline-block; padding: 1px 7px; border: 1.5px solid #000;
+                         background: #fff2bf; border-radius: 4px; color: #000; }
+
+  .wrap { max-width: none; padding: 0; }
+  .grid-scroll { max-height: none; overflow: visible; border-color: #b4b4b4; }
+  .grid-head { position: static; }
+  /* relative statt static: die Stundenlabels sind absolut und brauchen die Achse als Anker */
+  .axis { position: relative; }
+
+  /* Markiert = hervorgehoben, alles andere bleibt sichtbar, aber ausgegraut */
+  .set, .row { break-inside: avoid; opacity: 1 !important; filter: none !important; }
+  .set:not(.fav), .row:not(.fav) { opacity: .45 !important; }
+  .set.fav, .row.fav {
+    background: #fff2bf !important;
+    border-color: #000 !important;
+    border-width: 1.5px;
+    box-shadow: none !important;
+  }
+  .set.fav .artist, .row.fav .artist { color: #000 !important; }
+  .set.fav .time, .row.fav .time { color: #444 !important; }
+  .row.fav .star { color: #000 !important; }
+  .set.dimmed, .row.dimmed { display: none !important; }
+  .nowline { display: none; }
+  .list-floor h2 { break-after: avoid; }
 }

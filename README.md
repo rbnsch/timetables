@@ -8,6 +8,8 @@ Kein Server, keine Datenbank, keine Anmeldung.
 - **Favoriten antippen** → eigener Laufplan, pro Browser gespeichert
 - **„Nur meine Sets“**-Filter, **Suche** nach Acts/Genre, **Live-Marker** für die aktuelle Uhrzeit
 - **Teilen-Link**, der den eigenen Plan weitergibt, ohne fremde Favoriten zu überschreiben
+- **Export** als Bild (PNG) oder PDF – markierte Sets hervorgehoben, der Rest ausgegraut
+- **Backup** aller Markierungen als Datei, jederzeit wieder einspielbar
 
 ## Dateien
 
@@ -119,6 +121,47 @@ verlieren alle ihre Markierung für dieses Set – und bereits verschickte Teile
 `dayBoundaryHour: 6` heißt: Alles vor 06:00 gehört zur Nacht des angegebenen Tages.
 Ein Set von 23:00 bis 05:00 am 12.02. läuft also korrekt bis zum Morgen des 13.02.
 Bei einem Open Air, das mittags beginnt und vor Mitternacht endet, kann der Wert auf `0` stehen.
+
+## Export und Backup
+
+Button **Export** im Timetable:
+
+| | |
+|---|---|
+| **Als Bild (PNG)** | Der gewählte Tag als Grafik: markierte Sets leuchten gelb mit ★, alle anderen bleiben lesbar, aber ausgegraut. Gut zum Verschicken per Messenger. |
+| **Als PDF / drucken** | Öffnet den Druckdialog, dort „Als PDF speichern“. Druckt hell auf weiß statt clubschwarz, mit Legende und derselben Hervorhebung. |
+| **Backup speichern** | Alle Markierungen **aller** Events als `.json`. |
+| **Backup laden** | Spielt so eine Datei wieder ein – wahlweise *ersetzen* oder mit Vorhandenem *zusammenführen*. |
+
+Backup und Wiederherstellung gibt es zusätzlich unten auf der Startseite, weil sie alle Events betreffen.
+So kommen die Markierungen auch vom Handy auf den Laptop – oder zurück, wenn jemand seine Browserdaten löscht.
+
+Das Backup enthält nur Set-IDs, keine Namen:
+
+```json
+{
+  "type": "timetable-favorites",
+  "version": 1,
+  "exported": "2026-10-05T12:00:00.000Z",
+  "favorites": { "hive-indoor-2027": ["f03", "f11"] }
+}
+```
+
+## Wer darf was ändern?
+
+Ändern kann den Timetable **nur, wer Schreibrechte auf das GitHub-Repository hat** – also du.
+Die Seite selbst hat kein Backend und keine Schreib-Schnittstelle; Besucher laden nur fertige Dateien.
+
+`admin.html` ist **kein** Hintertürchen: Die Seite liest JSON, lässt dich damit herumspielen und
+spuckt am Ende Text aus. Sie schreibt nichts auf den Server. Wenn ein Freund dort etwas ändert,
+sieht er das nur in seinem eigenen Browser – nach einem Reload ist es weg.
+
+Ebenso sind Markierungen **pro Browser**: Niemand kann die Favoriten eines anderen verändern,
+auch nicht über einen Teilen-Link (der schlägt nur vor, zu übernehmen).
+
+Was öffentlich ist: **alles im Repository.** Bei einem öffentlichen Repo kann jeder mit dem Link
+auch `index.html` aufrufen und damit alle eingetragenen Events sehen – ein Teilen-Link schränkt
+nicht auf ein Event ein, er springt nur direkt dorthin.
 
 ## Grenzen
 
