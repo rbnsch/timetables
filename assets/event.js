@@ -12,7 +12,9 @@
     query: '',
     onlyFavs: false,
     favs: null,
+    parts: null,         // Teilbesuche: { setId: [vonMin, bisMin] }
     sharedIds: null,     // IDs aus einem geteilten Link
+    sharedParts: null,
     viewingShared: false,
     didAutoScroll: false,
   };
@@ -37,12 +39,18 @@
     if (ev.venue) $('#evvenue').textContent = ev.venue;
 
     state.favs = TT.makeFavourites(ev.id);
+    state.parts = TT.makePartials(ev.id);
 
     const shared = TT.decodeFavs(params.get('fav'));
     const knownIds = new Set(ev.sets.map((s) => s.id));
     const validShared = shared.filter((sid) => knownIds.has(sid));
     if (validShared.length) {
       state.sharedIds = new Set(validShared);
+      const incoming = TT.decodeParts(params.get('part'));
+      state.sharedParts = {};
+      for (const id of Object.keys(incoming)) {
+        if (state.sharedIds.has(id)) state.sharedParts[id] = incoming[id];
+      }
       state.viewingShared = true;
       showSharedBanner(validShared.length, shared.length - validShared.length);
     }
@@ -59,12 +67,29 @@
     wireControls();
 
     // Einmalige Delegation: #view wird bei jedem Render neu befuellt, bleibt aber bestehen.
+    // Der ★ liegt im Set-Element, darum zuerst darauf pruefen.
     $('#view').addEventListener('click', (e) => {
+      const star = e.target.closest('[data-edit]');
+      if (star) { openPartial(star.dataset.edit); return; }
       const el = e.target.closest('[data-set]');
       if (!el) return;
       const set = state.ev.sets.find((s) => s.id === el.dataset.set);
       if (set) toggleFav(set);
     });
+
+    // Set-Bloecke sind divs mit role="button" – Tastatur muss von Hand nachgezogen werden.
+    $('#view').addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const star = e.target.closest('[data-edit]');
+      if (star) return; // echte <button>, macht der Browser selbst
+      const el = e.target.closest('[data-set]');
+      if (!el) return;
+      e.preventDefault();
+      const set = state.ev.sets.find((s) => s.id === el.dataset.set);
+      if (set) toggleFav(set);
+    });
+
+    wirePartialDialog();
 
     render();
 
@@ -86,14 +111,25 @@
   /* ---------- Favoriten-Quelle ---------- */
 
   const activeIds = () => (state.viewingShared ? state.sharedIds : new Set(state.favs.list()));
+  const activeParts = () => (state.viewingShared ? (state.sharedParts || {}) : state.parts.all());
   const isFav = (set) => activeIds().has(set.id);
+
+  // Teilbesuch eines Sets als echte Zeiten – oder null, wenn das ganze Set gilt.
+  const partFor = (set) =>
+    (isFav(set) ? TT.partialRange(set, activeParts()[set.id]) : null);
 
   function toggleFav(set) {
     if (state.viewingShared) {
       flash('Das ist ein geteilter Plan. Oben „Zu meinem Plan hinzufügen“ oder „Eigenen Plan“ wählen.');
       return;
     }
-    state.favs.toggle(set.id);
+    const nowFav = state.favs.toggle(set.id);
+    // Entfernt man das Set, ergibt ein gespeicherter Teilbesuch keinen Sinn mehr.
+    if (!nowFav) state.parts.clear(set.id);
+    else if (!TT.readStore('tt.hint.part', false)) {
+      TT.writeStore('tt.hint.part', true);
+      flash('Tipp: Auf den ★ tippen, wenn du nur einen Teil des Sets sehen willst.');
+    }
     render({ keepScroll: true });
   }
 
@@ -112,6 +148,7 @@
 
     $('#adopt').addEventListener('click', () => {
       state.favs.merge([...state.sharedIds]);
+      if (state.sharedParts) state.parts.merge(state.sharedParts);
       leaveShared('Übernommen – ' + state.favs.size() + ' Sets in deinem Plan.');
     });
     $('#ownplan').addEventListener('click', () => leaveShared(''));
@@ -127,8 +164,10 @@
     } else {
       el.hidden = true;
     }
+    state.sharedParts = null;
     const u = new URL(location.href);
     u.searchParams.delete('fav');
+    u.searchParams.delete('part');
     history.replaceState(null, '', u);
     render({ keepScroll: true });
   }
@@ -231,7 +270,7 @@
     $('#expPng').addEventListener('click', async () => {
       exportMsg('Bild wird erzeugt…');
       try {
-        const res = await TTExport.pngForDay(state.ev, state.dayId, activeIds());
+        const res = await TTExport.pngForDay(state.ev, state.dayId, activeIds(), activeParts());
         exportMsg('Bild gespeichert (' + res.width + '×' + res.height + ' px, ' +
           res.favCount + ' markiert).');
       } catch (err) {
@@ -290,15 +329,130 @@
            'ausgegraute Sets laufen parallel</div>' : '');
   }
 
+  /* ---------- Teilbesuch ---------- */
+
+  let partTarget = null;
+
+  function openPartial(setId) {
+    if (state.viewingShared) {
+      flash('Das ist ein geteilter Plan. Erst „Zu meinem Plan hinzufügen“ wählen.');
+      return;
+    }
+    const s = state.ev.sets.find((x) => x.id === setId);
+    if (!s || !s._dur) return;
+    partTarget = s;
+
+    const dur = s._dur;
+    const cur = TT.partialRange(s, state.parts.get(s.id)) || { from: 0, to: dur };
+    const floor = state.ev.floors.find((f) => f.id === s.floor);
+
+    $('#partWho').textContent = s.artist + ' · ' +
+      TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end) +
+      (floor ? ' · ' + (floor.name || floor.id) : '');
+
+    fillPartOptions($('#partFrom'), s);
+    fillPartOptions($('#partTo'), s);
+    $('#partFrom').value = String(snapToOption($('#partFrom'), cur.from));
+    $('#partTo').value = String(snapToOption($('#partTo'), cur.to));
+
+    syncPartInfo();
+    $('#partDlg').showModal();
+  }
+
+  function partStep(dur) { return dur > 240 ? 30 : 15; }
+
+  function fillPartOptions(sel, s) {
+    const dur = s._dur, step = partStep(dur);
+    let html = '';
+    for (let m = 0; m <= dur; m += step) {
+      html += '<option value="' + m + '">' +
+        TT.fmtTime(new Date(+s._start + m * 6e4)) + '</option>';
+    }
+    // Das echte Set-Ende aufnehmen, falls die Dauer kein Vielfaches des Schritts ist
+    if (dur % step) html += '<option value="' + dur + '">' + TT.fmtTime(s._end) + '</option>';
+    sel.innerHTML = html;
+  }
+
+  // Auf den nächstgelegenen vorhandenen Wert runden, damit select.value nie ins Leere greift.
+  function snapToOption(sel, minutes) {
+    const vals = [...sel.options].map((o) => +o.value);
+    return vals.reduce((best, v) =>
+      Math.abs(v - minutes) < Math.abs(best - minutes) ? v : best, vals[0]);
+  }
+
+  function syncPartInfo() {
+    if (!partTarget) return;
+    const dur = partTarget._dur, step = partStep(dur);
+    let from = +$('#partFrom').value;
+    let to = +$('#partTo').value;
+
+    // „bis“ darf nie vor „von“ liegen – still nachziehen statt meckern.
+    if (to <= from) {
+      to = snapToOption($('#partTo'), Math.min(from + step, dur));
+      if (to <= from) { from = snapToOption($('#partFrom'), Math.max(0, to - step)); }
+      $('#partFrom').value = String(from);
+      $('#partTo').value = String(to);
+    }
+
+    const ganz = from <= 0 && to >= dur;
+    $('#partInfo').textContent = ganz
+      ? 'Das ist das ganze Set (' + TT.fmtDuration(dur) + ').'
+      : TT.fmtDuration(to - from) + ' von ' + TT.fmtDuration(dur) +
+        ' · du verpasst ' + TT.fmtDuration(dur - (to - from)) + '.';
+  }
+
+  function wirePartialDialog() {
+    $('#partFrom').addEventListener('change', syncPartInfo);
+    $('#partTo').addEventListener('change', syncPartInfo);
+
+    for (const b of document.querySelectorAll('#partDlg [data-preset]')) {
+      b.addEventListener('click', () => {
+        if (!partTarget) return;
+        const dur = partTarget._dur;
+        const half = Math.round(dur / 2);
+        const ranges = {
+          first: [0, half],
+          second: [half, dur],
+          start30: [0, Math.min(30, dur)],
+          end30: [Math.max(0, dur - 30), dur],
+        };
+        const r = ranges[b.dataset.preset];
+        if (!r) return;
+        $('#partFrom').value = String(snapToOption($('#partFrom'), r[0]));
+        $('#partTo').value = String(snapToOption($('#partTo'), r[1]));
+        syncPartInfo();
+      });
+    }
+
+    $('#partReset').addEventListener('click', () => {
+      if (partTarget) state.parts.clear(partTarget.id);
+      $('#partDlg').close();
+      render({ keepScroll: true });
+    });
+
+    $('#partSave').addEventListener('click', () => {
+      if (!partTarget) return;
+      const dur = partTarget._dur;
+      const from = +$('#partFrom').value, to = +$('#partTo').value;
+      if (from <= 0 && to >= dur) state.parts.clear(partTarget.id);
+      else state.parts.set(partTarget.id, from, to);
+      $('#partDlg').close();
+      render({ keepScroll: true });
+    });
+  }
+
   /* ---------- Teilen ---------- */
 
   function openShare() {
     const ids = [...activeIds()];
+    const parts = activeParts();
     const dlg = $('#shareDlg');
-    const url = TT.shareUrl(state.ev.id, state.dayId, ids);
+    const url = TT.shareUrl(state.ev.id, state.dayId, ids, parts);
+    const teil = ids.filter((id) => parts[id]).length;
 
     $('#shareInfo').textContent = ids.length
-      ? ids.length + ' markierte Sets. Der Link zeigt deinen Plan – Favoriten der Empfänger bleiben erhalten.'
+      ? ids.length + ' markierte Sets' + (teil ? ', davon ' + teil + ' nur teilweise' : '') +
+        '. Der Link zeigt deinen Plan – Favoriten der Empfänger bleiben erhalten.'
       : 'Du hast noch keine Sets markiert. Der Link zeigt dann nur den Timetable.';
     $('#shareUrl').value = url;
 
@@ -394,6 +548,30 @@
     return out;
   }
 
+  // ★ nur auf markierten Sets – dort ist er der Einstieg in den Teilbesuch.
+  function starHtml(s, cls) {
+    if (!isFav(s)) return '';
+    const part = partFor(s);
+    const label = part
+      ? 'Teilbesuch ändern: ' + TT.fmtTime(part.start) + ' bis ' + TT.fmtTime(part.end)
+      : 'Nur einen Teil von ' + s.artist + ' besuchen';
+    return '<button type="button" class="' + cls + '" data-edit="' + TT.escapeHtml(s.id) + '" ' +
+      'title="Nur einen Teil besuchen" aria-label="' + TT.escapeHtml(label) + '">★</button>';
+  }
+
+  // Dunkelt die Minuten ab, die man nicht mitnimmt – der Rest des Blocks bleibt hell.
+  function shadeHtml(s, part, ppm, blockH) {
+    if (!part) return '';
+    const full = s._dur * ppm;
+    const scale = full > 0 ? blockH / full : 1;
+    const top = part.from * ppm * scale;
+    const bottom = blockH - part.to * ppm * scale;
+    let out = '';
+    if (top > 0.5) out += '<span class="shade" style="top:0;height:' + top + 'px"></span>';
+    if (bottom > 0.5) out += '<span class="shade" style="bottom:0;height:' + bottom + 'px"></span>';
+    return out;
+  }
+
   // Floors, die in sets vorkommen, aber nicht in ev.floors deklariert sind.
   function appendOrphanFloors(floors, ev, sets) {
     const known = new Set(ev.floors.map((f) => f.id));
@@ -454,13 +632,22 @@
           '--floor:' + (f.color || 'var(--accent)'),
         ].join(';');
 
-        return '<button type="button" class="' + setClasses(s, matching, now).join(' ') + '" ' +
+        const part = partFor(s);
+        const cls = setClasses(s, matching, now);
+        if (part) cls.push('partial');
+        const blockH = Math.max(20, s._dur * ppm - 3);
+
+        return '<div class="' + cls.join(' ') + '" role="button" tabindex="0" ' +
           'style="' + TT.escapeHtml(style) + '" data-set="' + TT.escapeHtml(s.id) + '" ' +
           'aria-pressed="' + isFav(s) + '">' +
+          shadeHtml(s, part, ppm, blockH) +
           '<span class="artist">' + TT.escapeHtml(s.artist) + badges(s) + '</span>' +
-          '<span class="time">' + TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end) + '</span>' +
+          '<span class="time">' + (part
+            ? '✂ ' + TT.fmtTime(part.start) + '–' + TT.fmtTime(part.end)
+            : TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end)) + '</span>' +
           (s.genre ? '<span class="meta">' + TT.escapeHtml(s.genre) + '</span>' : '') +
-          '</button>';
+          starHtml(s, 'pin') +
+          '</div>';
       }).join('');
 
       return '<div class="lane" data-floor="' + TT.escapeHtml(f.id) + '">' + lines + blocks + '</div>';
@@ -516,15 +703,24 @@
         if (now >= s._start && now <= s._end) cls.push('playing');
         else if (s._end < now) cls.push('past');
 
-        const meta = [TT.fmtDuration(s._dur), s.genre, s.note].filter(Boolean).join(' · ');
-        return '<button type="button" class="' + cls.join(' ') + '" ' +
+        const part = partFor(s);
+        if (part) cls.push('partial');
+
+        const meta = part
+          ? ['✂ nur ' + TT.fmtDuration(part.minutes) +
+             ' (Set: ' + TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end) + ')', s.genre, s.note]
+            .filter(Boolean).join(' · ')
+          : [TT.fmtDuration(s._dur), s.genre, s.note].filter(Boolean).join(' · ');
+
+        return '<div class="' + cls.join(' ') + '" role="button" tabindex="0" ' +
           'style="--floor:' + TT.escapeHtml(f.color || 'var(--accent)') + '" ' +
           'data-set="' + TT.escapeHtml(s.id) + '" aria-pressed="' + isFav(s) + '">' +
-          '<span class="when"><b>' + TT.fmtTime(s._start) + '</b>' + TT.fmtTime(s._end) + '</span>' +
+          '<span class="when"><b>' + TT.fmtTime(part ? part.start : s._start) + '</b>' +
+          TT.fmtTime(part ? part.end : s._end) + '</span>' +
           '<span class="body"><span class="artist">' + TT.escapeHtml(s.artist) + badges(s) + '</span>' +
           (meta ? '<span class="meta">' + TT.escapeHtml(meta) + '</span>' : '') + '</span>' +
-          '<span class="star">' + (isFav(s) ? '★' : '☆') + '</span>' +
-          '</button>';
+          (isFav(s) ? starHtml(s, 'star') : '<span class="star">☆</span>') +
+          '</div>';
       }).join('');
 
       return '<section class="list-floor" style="--floor:' +

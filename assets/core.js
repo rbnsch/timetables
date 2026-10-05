@@ -132,17 +132,80 @@ window.TT = (function () {
     };
   }
 
+  /* ---------- Teilbesuche ---------- */
+
+  // Gespeichert als Offsets in Minuten ab Set-Beginn: { setId: [von, bis] }.
+  // Offsets statt Uhrzeiten, damit die Auswahl ein Verschieben des Sets ueberlebt.
+  const partKey = (eventId) => 'tt.part.' + eventId;
+
+  function makePartials(eventId) {
+    let map = readStore(partKey(eventId), {});
+    if (!map || typeof map !== 'object' || Array.isArray(map)) map = {};
+    const persist = () => writeStore(partKey(eventId), map);
+    return {
+      get: (id) => (Array.isArray(map[id]) ? map[id] : null),
+      all: () => ({ ...map }),
+      count: () => Object.keys(map).length,
+      set(id, from, to) { map[id] = [Math.round(from), Math.round(to)]; persist(); },
+      clear(id) { delete map[id]; persist(); },
+      replaceAll(next) { map = next && typeof next === 'object' ? { ...next } : {}; persist(); },
+      merge(next) { Object.assign(map, next || {}); persist(); },
+    };
+  }
+
+  // Rechnet Offsets in echte Zeiten um und klemmt sie in die aktuelle Set-Dauer.
+  // Deckt die Auswahl das ganze Set ab, gilt sie als "kein Teilbesuch".
+  function partialRange(set, offsets) {
+    if (!set || !offsets || !set._start || !set._dur) return null;
+    const dur = set._dur;
+    const from = Math.max(0, Math.min(offsets[0], dur));
+    const to = Math.max(from, Math.min(offsets[1], dur));
+    if (from <= 0 && to >= dur) return null;
+    if (to - from < 1) return null;
+    return {
+      from, to,
+      start: new Date(+set._start + from * 6e4),
+      end: new Date(+set._start + to * 6e4),
+      minutes: to - from,
+    };
+  }
+
   /* ---------- Teilen ---------- */
 
   // Set-IDs sind stabil -> Links bleiben gueltig, auch wenn Zeiten korrigiert werden.
-  const encodeFavs = (idList) => idList.slice().sort().join('.');
-  const decodeFavs = (str) => (str ? str.split('.').filter(Boolean) : []);
+  // Der Punkt trennt die Eintraege, darum muss er in einer ID maskiert werden –
+  // sonst faellt eine ID wie "a.b" beim Dekodieren still auseinander.
+  const encId = (id) => String(id).replace(/%/g, '%25').replace(/\./g, '%2E');
+  const decId = (id) => String(id).replace(/%2E/gi, '.').replace(/%25/g, '%');
 
-  function shareUrl(eventId, dayId, idList) {
+  const encodeFavs = (idList) => idList.slice().sort().map(encId).join('.');
+  const decodeFavs = (str) => (str ? str.split('.').filter(Boolean).map(decId) : []);
+
+  // "tc05-0-45.rb07-30-120" – Punkt trennt Eintraege, Bindestrich die Zahlen.
+  const encodeParts = (map) => Object.keys(map || {}).sort()
+    .map((id) => encId(id) + '-' + map[id][0] + '-' + map[id][1]).join('.');
+
+  function decodeParts(str) {
+    const out = {};
+    for (const chunk of (str || '').split('.').filter(Boolean)) {
+      // Gierig: die letzten beiden Zahlengruppen sind die Zeiten, der Rest ist die ID.
+      const m = chunk.match(/^(.+)-(\d+)-(\d+)$/);
+      if (!m) continue;
+      out[decId(m[1])] = [+m[2], +m[3]];
+    }
+    return out;
+  }
+
+  function shareUrl(eventId, dayId, idList, partMap) {
     const u = new URL('event.html', location.href);
     u.searchParams.set('e', eventId);
     if (dayId) u.searchParams.set('d', dayId);
     u.searchParams.set('fav', encodeFavs(idList));
+    // Nur Teilbesuche mitschicken, die zu einem geteilten Set gehoeren
+    const favSet = new Set(idList);
+    const relevant = {};
+    for (const id of Object.keys(partMap || {})) if (favSet.has(id)) relevant[id] = partMap[id];
+    if (Object.keys(relevant).length) u.searchParams.set('part', encodeParts(relevant));
     return u.toString();
   }
 
@@ -208,8 +271,8 @@ window.TT = (function () {
   return {
     DATA_DIR, loadManifest, loadEventFile, loadEventById, prepare, resolveTime,
     setsForDay, cancelledForDay, currentDayId,
-    makeFavourites, readStore, writeStore,
-    encodeFavs, decodeFavs, shareUrl,
+    makeFavourites, makePartials, partialRange, readStore, writeStore,
+    encodeFavs, decodeFavs, encodeParts, decodeParts, shareUrl,
     fmtTime, fmtDayDate, fmtDuration, packLanes, matchesQuery, escapeHtml,
   };
 })();

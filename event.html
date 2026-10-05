@@ -93,6 +93,30 @@
   </div>
 </dialog>
 
+<dialog id="partDlg">
+  <h2>Nur einen Teil besuchen</h2>
+  <p class="muted" id="partWho"></p>
+
+  <div class="partpresets">
+    <button type="button" class="btn sm ghost" data-preset="first">Erste Hälfte</button>
+    <button type="button" class="btn sm ghost" data-preset="second">Zweite Hälfte</button>
+    <button type="button" class="btn sm ghost" data-preset="start30">Erste 30 Min</button>
+    <button type="button" class="btn sm ghost" data-preset="end30">Letzte 30 Min</button>
+  </div>
+
+  <div class="partrow">
+    <label class="field">von<select id="partFrom"></select></label>
+    <label class="field">bis<select id="partTo"></select></label>
+  </div>
+
+  <p class="faint" id="partInfo"></p>
+
+  <div class="actions">
+    <button type="button" class="btn ghost" id="partReset">Ganzes Set</button>
+    <button type="button" class="btn" id="partSave">Übernehmen</button>
+  </div>
+</dialog>
+
 <script src="assets/core.js"></script>
 <script src="assets/export.js"></script>
 <script src="assets/event.js"></script>

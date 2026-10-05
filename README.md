@@ -7,6 +7,7 @@ Kein Server, keine Datenbank, keine Anmeldung.
 - **Mehrere Festivaltage**, Reiter zum Wechseln
 - **Favoriten antippen** → eigener Laufplan, pro Browser gespeichert
 - **„Nur meine Sets“**-Filter, **Suche** nach Acts/Genre, **Live-Marker** für die aktuelle Uhrzeit
+- **Teilbesuche** – nur die erste Hälfte eines Sets einplanen, wenn parallel etwas anderes läuft
 - **Teilen-Link**, der den eigenen Plan weitergibt, ohne fremde Favoriten zu überschreiben
 - **Export** als Bild (PNG) oder PDF – markierte Sets hervorgehoben, der Rest ausgegraut
 - **Backup** aller Markierungen als Datei, jederzeit wieder einspielbar
@@ -120,7 +121,7 @@ verlieren alle ihre Markierung für dieses Set – und bereits verschickte Teile
 
   "sets": [
     {
-      "id": "f01",                   // stabil halten!
+      "id": "f01",                   // stabil halten! Am besten nur a-z, 0-9, Bindestrich
       "day": "fr",
       "floor": "main",
       "artist": "Name",
@@ -138,6 +139,27 @@ verlieren alle ihre Markierung für dieses Set – und bereits verschickte Teile
 `dayBoundaryHour: 6` heißt: Alles vor 06:00 gehört zur Nacht des angegebenen Tages.
 Ein Set von 23:00 bis 05:00 am 12.02. läuft also korrekt bis zum Morgen des 13.02.
 Bei einem Open Air, das mittags beginnt und vor Mitternacht endet, kann der Wert auf `0` stehen.
+
+## Teilbesuche
+
+Bei mehreren Floors überschneiden sich Sets zwangsläufig. Darum kann man zu einem markierten Set
+festhalten, dass man nur einen Teil davon mitnimmt:
+
+1. Set antippen → markiert
+2. Auf den **★** in der Ecke tippen
+3. **Erste Hälfte** / **Zweite Hälfte** / **Erste 30 Min** / **Letzte 30 Min** – oder die Dropdowns
+   für „von“ und „bis“ in 15-Minuten-Schritten
+4. **Übernehmen**
+
+Im Raster bleibt der gewählte Ausschnitt hell, der Rest des Blocks wird abgedunkelt – man sieht also
+auf einen Blick, wann man rübergeht. In der Liste steht die verkürzte Zeit, darunter das volle Set.
+**Ganzes Set** macht die Einschränkung wieder rückgängig.
+
+Teilbesuche landen im Teilen-Link, im Backup und in beiden Exporten (Bild und PDF).
+
+> Gespeichert werden **Minuten ab Set-Beginn**, keine Uhrzeiten. Verschiebt sich ein Set später um
+> eine halbe Stunde, bleibt „erste Hälfte“ weiterhin die erste Hälfte. Wird es kürzer, wird die
+> Auswahl automatisch auf die neue Länge gestutzt.
 
 ## Export und Backup
 
@@ -158,11 +180,15 @@ Das Backup enthält nur Set-IDs, keine Namen:
 ```json
 {
   "type": "timetable-favorites",
-  "version": 1,
+  "version": 2,
   "exported": "2026-10-05T12:00:00.000Z",
-  "favorites": { "hive-indoor-2027": ["f03", "f11"] }
+  "favorites": { "hive-indoor-2026": ["tc06", "rb07"] },
+  "partials":  { "hive-indoor-2026": { "tc06": [0, 45] } }
 }
 ```
+
+`"tc06": [0, 45]` heißt: von diesem Set nur die Minuten 0 bis 45. Ältere Backups ohne `partials`
+lassen sich weiterhin einspielen.
 
 ## Wer darf was ändern?
 

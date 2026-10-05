@@ -341,17 +341,45 @@ button, input, select {
 }
 .set.fav .artist { color: #ffe680; }
 .set.fav .time { color: #c8b25a; }
-.set.fav::after {
-  content: "★";
-  position: absolute;
-  top: 3px; right: 5px;
-  font-size: 11px;
-  color: var(--accent);
-}
 .set.playing { border-left-color: var(--live); }
 .set.playing .time { color: #ff8fa3; }
 .set.past { opacity: .42; }
 .set.dimmed { opacity: .16; filter: saturate(.3); }
+/* ★ als Einstieg in den Teilbesuch – grosszuegige Trefferflaeche fuers Handy */
+.set .pin, .row .star {
+  position: absolute;
+  top: 0; right: 0;
+  width: 30px; height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 3;
+}
+.set .pin:hover { transform: scale(1.25); }
+.set .pin:focus-visible, .row .star:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: 6px;
+}
+
+/* Minuten, die man nicht mitnimmt */
+.shade {
+  position: absolute;
+  left: 0; right: 0;
+  background: rgba(10, 11, 15, .72);
+  pointer-events: none;
+  z-index: 2;
+}
+.set.partial { border-left-style: dashed; }
+.set.partial .artist, .set.partial .time { position: relative; z-index: 3; }
+
 .set.cancelled { opacity: .5; }
 .set.cancelled .artist { text-decoration: line-through; }
 .set.short { padding: 2px 6px; }
@@ -403,7 +431,18 @@ button, input, select {
 .row .body { flex: 1 1 auto; min-width: 0; }
 .row .body .artist { display: block; font-weight: 600; }
 .row .body .meta { display: block; font-size: 12px; color: var(--fg-faint); margin-top: 2px; }
-.row .star { flex: 0 0 auto; align-self: center; font-size: 18px; color: var(--line); }
+.row { position: relative; }
+.row .star {
+  position: static;
+  flex: 0 0 auto;
+  align-self: center;
+  width: 38px; height: 38px;
+  font-size: 18px;
+  color: var(--line);
+}
+.row.fav .star { color: var(--accent); }
+.row .star:hover { transform: scale(1.15); }
+.row.partial { border-left-style: dashed; }
 
 .row.fav {
   background: linear-gradient(90deg, #332a04, #1a1a22 60%);
@@ -524,6 +563,21 @@ dialog .exportrow .btn { flex: 0 0 auto; min-width: 150px; justify-content: cent
 dialog .exportrow .faint { flex: 1 1 auto; line-height: 1.35; }
 dialog#exportDlg { max-width: 520px; }
 
+dialog .partpresets { display: flex; gap: 6px; flex-wrap: wrap; margin: 14px 0 4px; }
+dialog .partrow { display: flex; gap: 12px; margin: 12px 0 4px; }
+dialog .partrow .field { flex: 1 1 0; display: flex; flex-direction: column; gap: 4px;
+                         font-size: 12px; color: var(--fg-dim); }
+dialog .partrow select {
+  padding: 10px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-sunken);
+  color: var(--fg);
+  font-size: 16px; /* unter 16px zoomt iOS Safari beim Antippen hinein */
+  font-variant-numeric: tabular-nums;
+  width: 100%;
+}
+
 .footer {
   padding: 28px 0 40px;
   color: var(--fg-faint);
@@ -582,6 +636,8 @@ dialog#exportDlg { max-width: 520px; }
   .set.fav .time, .row.fav .time { color: #444 !important; }
   .row.fav .star { color: #000 !important; }
   .set.dimmed, .row.dimmed { display: none !important; }
+  .shade { background: rgba(0, 0, 0, .14) !important; }
+  .set .pin, .row .star { color: #000 !important; }
   .nowline { display: none; }
   .list-floor h2 { break-after: avoid; }
 }

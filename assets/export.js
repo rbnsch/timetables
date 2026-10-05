@@ -3,6 +3,7 @@ window.TTExport = (function () {
   'use strict';
 
   const FAV_PREFIX = 'tt.fav.';
+  const PART_PREFIX = 'tt.part.';
 
   function download(blob, filename) {
     const a = document.createElement('a');
@@ -35,13 +36,30 @@ window.TTExport = (function () {
     return out;
   }
 
+  // Teilbesuche aller Events: { eventId: { setId: [von, bis] } }
+  function collectPartials() {
+    const out = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (!key || key.indexOf(PART_PREFIX) !== 0) continue;
+      try {
+        const map = JSON.parse(localStorage.getItem(key));
+        if (map && typeof map === 'object' && Object.keys(map).length) {
+          out[key.slice(PART_PREFIX.length)] = map;
+        }
+      } catch (e) { /* kaputter Eintrag wird uebersprungen */ }
+    }
+    return out;
+  }
+
   function downloadBackup() {
     const favourites = collectFavourites();
     const payload = {
       type: 'timetable-favorites',
-      version: 1,
+      version: 2,
       exported: new Date().toISOString(),
       favorites: favourites,
+      partials: collectPartials(),
     };
     const stamp = new Date().toISOString().slice(0, 10);
     download(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
@@ -78,6 +96,26 @@ window.TTExport = (function () {
       events++;
       sets += next.length;
     }
+
+    // Aeltere Backups (version 1) haben kein partials – dann bleibt es einfach leer.
+    const parts = (data.partials && typeof data.partials === 'object') ? data.partials : {};
+    for (const eventId of Object.keys(parts)) {
+      const incoming = parts[eventId];
+      if (!incoming || typeof incoming !== 'object') continue;
+      const key = PART_PREFIX + eventId;
+      let next = {};
+      for (const setId of Object.keys(incoming)) {
+        const r = incoming[setId];
+        if (Array.isArray(r) && r.length === 2 && isFinite(r[0]) && isFinite(r[1])) next[setId] = r;
+      }
+      if (mode === 'merge') {
+        let current = {};
+        try { current = JSON.parse(localStorage.getItem(key)) || {}; } catch (e) { current = {}; }
+        next = Object.assign(current, next);
+      }
+      localStorage.setItem(key, JSON.stringify(next));
+    }
+
     return { events, sets };
   }
 
@@ -102,6 +140,9 @@ window.TTExport = (function () {
     return t + '…';
   }
 
+  const partialOf = (set, partMap) =>
+    (partMap ? TT.partialRange(set, partMap[set.id]) : null);
+
   const C = {
     bg: '#0c0d12', panel: '#15171f', line: '#262a36', soft: '#1c1f29',
     fg: '#eef0f6', dim: '#969cb0', faint: '#636a80',
@@ -109,7 +150,7 @@ window.TTExport = (function () {
   };
 
   // Zeichnet den Tag als Bild: Markiertes leuchtet, der Rest bleibt lesbar, aber grau.
-  function pngForDay(ev, dayId, favIds) {
+  function pngForDay(ev, dayId, favIds, partMap) {
     const day = ev.days.find((d) => d.id === dayId) || {};
     const sets = ev.sets
       .filter((s) => s.day === dayId && s._start && s._end)
@@ -206,6 +247,7 @@ window.TTExport = (function () {
         const h = Math.max(16, (s._dur * PPM) - 3);
         const fav = favIds.has(s.id);
         const off = s.status === 'cancelled';
+        const part = fav ? partialOf(s, partMap) : null;
 
         ctx.fillStyle = fav ? C.favBg : C.panel;
         roundRect(ctx, x, y, w - 3, h, 6);
@@ -221,7 +263,24 @@ window.TTExport = (function () {
         ctx.fillRect(x, y + 2, 2.5, h - 4);
         ctx.globalAlpha = 1;
 
+        // Nicht besuchte Minuten abdunkeln – der gewaehlte Ausschnitt bleibt hell.
+        if (part) {
+          const scale = h / Math.max(1, s._dur * PPM);
+          const a = part.from * PPM * scale;
+          const b = part.to * PPM * scale;
+          ctx.save();
+          roundRect(ctx, x, y, w - 3, h, 6);
+          ctx.clip();
+          ctx.fillStyle = 'rgba(12,13,18,0.72)';
+          if (a > 0.5) ctx.fillRect(x, y, w - 3, a);
+          if (h - b > 0.5) ctx.fillRect(x, y + b, w - 3, h - b);
+          ctx.restore();
+        }
+
         const textW = w - 16;
+        const shownRange = part
+          ? TT.fmtTime(part.start) + '–' + TT.fmtTime(part.end)
+          : TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end);
         ctx.fillStyle = fav ? C.favFg : (off ? C.faint : C.dim);
         ctx.font = (fav ? '700 ' : '600 ') + '12px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
         const name = (s.artist || '') + (off ? ' (abgesagt)' : '');
@@ -230,7 +289,7 @@ window.TTExport = (function () {
         if (h > 30) {
           ctx.fillStyle = fav ? '#c8b25a' : C.faint;
           ctx.font = '11px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-          ctx.fillText(TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end), x + 7, y + 21);
+          ctx.fillText((part ? '\u2702 ' : '') + shownRange, x + 7, y + 21);
         }
         if (fav) {
           ctx.fillStyle = C.accent;
@@ -239,6 +298,7 @@ window.TTExport = (function () {
           ctx.fillText('★', x + w - 7, y + 5);
           ctx.textAlign = 'left';
         }
+
       }
     });
 
@@ -267,5 +327,5 @@ window.TTExport = (function () {
     window.print();
   }
 
-  return { downloadBackup, readBackup, applyBackup, collectFavourites, pngForDay, printPlan };
+  return { downloadBackup, readBackup, applyBackup, collectFavourites, collectPartials, pngForDay, printPlan };
 })();
