@@ -180,11 +180,16 @@ window.TT = (function () {
   // "jaeger" und "jager" gefunden, egal ob die Daten Umlaut oder ue enthalten.
   function variants(str) {
     const strip = (x) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    const base = (str || '').toLowerCase().replace(/ß/g, 'ss');
+    // Ø/Æ/Å zerlegt NFD nicht – in Techno-Lineups aber Dauergast (GIØ, BØERY, SANTØS)
+    const base = (str || '').toLowerCase()
+      .replace(/ß/g, 'ss').replace(/ø/g, 'o').replace(/æ/g, 'ae').replace(/å/g, 'a')
+      .replace(/đ|ð/g, 'd').replace(/ł/g, 'l').replace(/þ/g, 'th');
     const stripped = strip(base);
     const spelled = strip(base.replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue'));
     const collapsed = stripped.replace(/ae/g, 'a').replace(/oe/g, 'o').replace(/ue/g, 'u');
-    return [...new Set([stripped, spelled, collapsed])].filter(Boolean);
+    // Ohne Satzzeichen, damit "obi" auch O.B.I. und "vorteks" auch VORTEK'S findet
+    const squashed = stripped.replace(/[^a-z0-9]/g, '');
+    return [...new Set([stripped, spelled, collapsed, squashed])].filter(Boolean);
   }
 
   function matchesQuery(set, query) {

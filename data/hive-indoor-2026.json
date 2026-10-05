@@ -1,0 +1,59 @@
+{
+  "id": "hive-indoor-2026",
+  "name": "Hive Indoor",
+  "venue": "",
+  "dayBoundaryHour": 6,
+
+  "days": [
+    { "id": "d1", "label": "Samstag", "date": "2026-10-17" }
+  ],
+
+  "floors": [
+    { "id": "colosseum", "name": "Techno Colosseum", "color": "#ff2e3f" },
+    { "id": "vault", "name": "Iron Vault", "color": "#5aa9ff" },
+    { "id": "cargo", "name": "Cargo Bay", "color": "#ffa03a" },
+    { "id": "rage", "name": "Rage Box", "color": "#c86bff" }
+  ],
+
+  "sets": [
+    { "id": "tc01", "day": "d1", "floor": "colosseum", "artist": "ÜBERKIKZ B2B FELICIE", "start": "15:00", "end": "16:30" },
+    { "id": "tc02", "day": "d1", "floor": "colosseum", "artist": "YANAMASTE", "start": "16:30", "end": "18:00" },
+    { "id": "tc03", "day": "d1", "floor": "colosseum", "artist": "KLANGKUENSTLER", "start": "18:00", "end": "19:30" },
+    { "id": "tc04", "day": "d1", "floor": "colosseum", "artist": "SCHROTTHAGEN", "start": "19:30", "end": "21:00" },
+    { "id": "tc05", "day": "d1", "floor": "colosseum", "artist": "KOBOSIL", "start": "21:00", "end": "22:30" },
+    { "id": "tc06", "day": "d1", "floor": "colosseum", "artist": "NICO MORENO", "start": "22:30", "end": "00:00" },
+    { "id": "tc07", "day": "d1", "floor": "colosseum", "artist": "HOLY PRIEST", "start": "00:00", "end": "01:30" },
+    { "id": "tc08", "day": "d1", "floor": "colosseum", "artist": "WINSON B2B KLOFAMA", "start": "01:30", "end": "03:30" },
+    { "id": "tc09", "day": "d1", "floor": "colosseum", "artist": "NOTMYTYPE", "start": "03:30", "end": "05:00" },
+
+    { "id": "iv01", "day": "d1", "floor": "vault", "artist": "NOISE NOT WAR B2B TRÜMMER (live)", "start": "15:00", "end": "16:30" },
+    { "id": "iv02", "day": "d1", "floor": "vault", "artist": "BEN TECHY B2B LUCIID", "start": "16:30", "end": "18:00" },
+    { "id": "iv03", "day": "d1", "floor": "vault", "artist": "OBSCURE SHAPE B2B NEON GRAVEYARD", "start": "18:00", "end": "19:30" },
+    { "id": "iv04", "day": "d1", "floor": "vault", "artist": "NIKOLINA B2B KLOUD", "start": "19:30", "end": "21:00" },
+    { "id": "iv05", "day": "d1", "floor": "vault", "artist": "TRIPTYKH B2B O.B.I.", "start": "21:00", "end": "23:00" },
+    { "id": "iv06", "day": "d1", "floor": "vault", "artist": "IN VERRUF B2B ORNELLA", "start": "23:00", "end": "00:30" },
+    { "id": "iv07", "day": "d1", "floor": "vault", "artist": "CHARLIE SPARKS B2B NICOLAS JULIAN", "start": "00:30", "end": "02:00" },
+    { "id": "iv08", "day": "d1", "floor": "vault", "artist": "A.N.I. B2B OMAKS", "start": "02:00", "end": "03:30" },
+
+    { "id": "cb01", "day": "d1", "floor": "cargo", "artist": "SAGEZZA", "start": "15:00", "end": "17:00" },
+    { "id": "cb02", "day": "d1", "floor": "cargo", "artist": "TIEFUNDTON", "start": "17:00", "end": "18:30" },
+    { "id": "cb03", "day": "d1", "floor": "cargo", "artist": "KAACEE KOMACASPER", "start": "18:30", "end": "19:30" },
+    { "id": "cb04", "day": "d1", "floor": "cargo", "artist": "DIE GEBRÜDER BRETT", "start": "19:30", "end": "20:30" },
+    { "id": "cb05", "day": "d1", "floor": "cargo", "artist": "POLTERGST", "start": "20:30", "end": "21:30" },
+    { "id": "cb06", "day": "d1", "floor": "cargo", "artist": "KØ:LAB & ANUUK & DONCHOPPA", "start": "21:30", "end": "22:30" },
+    { "id": "cb07", "day": "d1", "floor": "cargo", "artist": "GIØ B2B ZWILLING.", "start": "22:30", "end": "00:00" },
+    { "id": "cb08", "day": "d1", "floor": "cargo", "artist": "L.ZWO B2B 2HOT2PLAY", "start": "00:00", "end": "01:30" },
+    { "id": "cb09", "day": "d1", "floor": "cargo", "artist": "DJ DRECKISCH B2B DICE", "start": "01:30", "end": "03:00" },
+    { "id": "cb10", "day": "d1", "floor": "cargo", "artist": "NOISE MAFIA B2B FENRICK", "start": "03:00", "end": "05:00" },
+
+    { "id": "rb01", "day": "d1", "floor": "rage", "artist": "ALLY B2B SALTYSIS", "start": "15:00", "end": "16:00" },
+    { "id": "rb02", "day": "d1", "floor": "rage", "artist": "IKKHI B2B TITI", "start": "16:00", "end": "17:00" },
+    { "id": "rb03", "day": "d1", "floor": "rage", "artist": "IGDA B2B JOVYNN", "start": "17:00", "end": "18:30" },
+    { "id": "rb04", "day": "d1", "floor": "rage", "artist": "NATTE VISSTICK B2B MAD DOG", "start": "18:30", "end": "20:00" },
+    { "id": "rb05", "day": "d1", "floor": "rage", "artist": "SLVL B2B TOXIC MACHINERY", "start": "20:00", "end": "21:30" },
+    { "id": "rb06", "day": "d1", "floor": "rage", "artist": "USH B2B JOWI", "start": "21:30", "end": "23:00" },
+    { "id": "rb07", "day": "d1", "floor": "rage", "artist": "VORTEK'S B2B WILLIAM LUCK", "start": "23:00", "end": "01:00" },
+    { "id": "rb08", "day": "d1", "floor": "rage", "artist": "ANGERFIST B2B VIEZE ASBAK", "start": "01:00", "end": "02:30" },
+    { "id": "rb09", "day": "d1", "floor": "rage", "artist": "BØERY B2B SANTØS", "start": "02:30", "end": "04:00" }
+  ]
+}
