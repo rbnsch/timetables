@@ -172,9 +172,9 @@ window.TTExport = (function () {
       accent: accent,
       // Hintergrund des markierten Blocks: Akzent leicht in die Flaeche gemischt
       favBg: mix(toRgb(panel), accentRgb, 0.17) || panel,
-      // Schrift darauf: Akzent Richtung Weiss aufgehellt, sonst zu dunkel
-      favFg: mix(accentRgb, white, 0.45) || accent,
-      favDim: mix(accentRgb, white, 0.15) || accent,
+      // Markiertes muss heller sein als der Rest, nicht farbiger
+      favFg: '#ffffff',
+      favDim: mix(accentRgb, white, 0.82) || '#e8e8e8',
       shade: toRgb(v('--bg', '#0c0d12')),
     };
   }

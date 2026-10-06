@@ -179,12 +179,16 @@ und auch den Bild-Export.
 }
 ```
 
+> **Die Schrift markierter Sets bleibt immer weiß und fett**, unabhängig von der Palette.
+> Eine eingefärbte Schrift wirkt neben weißem Text dunkler – markierte Sets würden dadurch
+> *weniger* auffallen statt mehr. Die Hervorhebung trägt der Hintergrund, nicht die Schriftfarbe.
+
 Alle Schlüssel sind optional – was fehlt, bleibt auf dem Standardwert. Entscheidend sind
 eigentlich nur `accent` (die Hervorhebungsfarbe) und `bg` (der Grundton).
 
 | Schlüssel | Wofür |
 |---|---|
-| `accent` | Markierte Sets, aktive Buttons, Links, ★ |
+| `accent` | Rahmen und Hintergrundton markierter Sets, aktive Buttons, Links, ★ |
 | `accentFg` | Schrift **auf** der Akzentfarbe – muss dazu kontrastieren |
 | `bg` / `bgRaised` / `bgSunken` | Seite / Kacheln / Rasterfläche |
 | `line` / `lineSoft` | Rahmen und Stundenlinien |
