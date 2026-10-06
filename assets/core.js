@@ -92,6 +92,51 @@ window.TT = (function () {
     return upcoming ? upcoming.id : (ev.days[0] && ev.days[0].id) || null;
   }
 
+  /* ---------- Farbpalette pro Event ---------- */
+
+  // Erlaubte Schluessel im "theme"-Block einer Event-Datei -> CSS-Variable.
+  const THEME_VARS = {
+    accent: '--accent',
+    accentFg: '--accent-fg',
+    bg: '--bg',
+    bgRaised: '--bg-raised',
+    bgSunken: '--bg-sunken',
+    line: '--line',
+    lineSoft: '--line-soft',
+    fg: '--fg',
+    fgDim: '--fg-dim',
+    fgFaint: '--fg-faint',
+    live: '--live',
+  };
+
+  // Nur simple Farbangaben zulassen – sonst koennte ein Tippfehler im JSON
+  // beliebiges CSS in die Seite schreiben.
+  const COLOR_RE = /^(#[0-9a-f]{3,8}|rgba?\([\d\s.,%/]+\)|hsla?\([\d\s.,%/deg]+\)|[a-z]{3,20})$/i;
+
+  function applyTheme(theme) {
+    const root = document.documentElement;
+    const angewendet = [];
+    if (!theme || typeof theme !== 'object') return angewendet;
+
+    for (const key of Object.keys(THEME_VARS)) {
+      const value = theme[key];
+      if (typeof value !== 'string' || !COLOR_RE.test(value.trim())) continue;
+      root.style.setProperty(THEME_VARS[key], value.trim());
+      angewendet.push(key);
+    }
+
+    // Adressleiste auf Mobilgeraeten mitfaerben
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta && angewendet.includes('bg')) meta.setAttribute('content', theme.bg.trim());
+    return angewendet;
+  }
+
+  // Farben der aktiven Palette auslesen – fuer den Bild-Export, der kein CSS kennt.
+  function themeColor(cssVar, fallback) {
+    const v = getComputedStyle(document.documentElement).getPropertyValue(cssVar);
+    return (v && v.trim()) || fallback;
+  }
+
   /* ---------- Favoriten (pro Browser, pro Event) ---------- */
 
   const favKey = (eventId) => 'tt.fav.' + eventId;
@@ -272,6 +317,7 @@ window.TT = (function () {
     DATA_DIR, loadManifest, loadEventFile, loadEventById, prepare, resolveTime,
     setsForDay, cancelledForDay, currentDayId,
     makeFavourites, makePartials, partialRange, readStore, writeStore,
+    applyTheme, themeColor,
     encodeFavs, decodeFavs, encodeParts, decodeParts, shareUrl,
     fmtTime, fmtDayDate, fmtDuration, packLanes, matchesQuery, escapeHtml,
   };

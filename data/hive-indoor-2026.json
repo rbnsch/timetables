@@ -4,15 +4,29 @@
   "venue": "",
   "dayBoundaryHour": 6,
 
+  "theme": {
+    "accent": "#ff2233",
+    "accentFg": "#ffffff",
+    "bg": "#0b0a0c",
+    "bgRaised": "#171418",
+    "bgSunken": "#080709",
+    "line": "#332a2e",
+    "lineSoft": "#241d21",
+    "fg": "#f7f4f5",
+    "fgDim": "#a79aa0",
+    "fgFaint": "#70656b",
+    "live": "#ffffff"
+  },
+
   "days": [
     { "id": "d1", "label": "Samstag", "date": "2026-10-17" }
   ],
 
   "floors": [
-    { "id": "colosseum", "name": "Techno Colosseum", "color": "#ff2e3f" },
-    { "id": "vault", "name": "Iron Vault", "color": "#5aa9ff" },
-    { "id": "cargo", "name": "Cargo Bay", "color": "#ffa03a" },
-    { "id": "rage", "name": "Rage Box", "color": "#c86bff" }
+    { "id": "colosseum", "name": "Techno Colosseum", "color": "#ff2233" },
+    { "id": "vault", "name": "Iron Vault", "color": "#ffffff" },
+    { "id": "cargo", "name": "Cargo Bay", "color": "#ff8fa0" },
+    { "id": "rage", "name": "Rage Box", "color": "#8e97a8" }
   ],
 
   "sets": [

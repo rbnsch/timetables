@@ -143,14 +143,45 @@ window.TTExport = (function () {
   const partialOf = (set, partMap) =>
     (partMap ? TT.partialRange(set, partMap[set.id]) : null);
 
-  const C = {
-    bg: '#0c0d12', panel: '#15171f', line: '#262a36', soft: '#1c1f29',
-    fg: '#eef0f6', dim: '#969cb0', faint: '#636a80',
-    accent: '#ffd84d', favBg: '#2b2305', favFg: '#ffe680',
-  };
+  // "#abc" / "#aabbcc" -> [r,g,b]; alles andere (rgb(), Farbnamen) -> null
+  function toRgb(c) {
+    const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec((c || '').trim());
+    if (!m) return null;
+    const h = m[1].length === 3 ? m[1].replace(/./g, (x) => x + x) : m[1];
+    return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
+  }
+
+  const mix = (a, b, t) =>
+    (a && b) ? 'rgb(' + a.map((v, i) => Math.round(v + (b[i] - v) * t)).join(',') + ')' : null;
+
+  // Farben aus der aktiven Palette ziehen, damit das Bild wie die Seite aussieht.
+  function palette() {
+    const v = (name, fb) => TT.themeColor(name, fb);
+    const accent = v('--accent', '#ffd84d');
+    const panel = v('--bg-raised', '#15171f');
+    const accentRgb = toRgb(accent);
+    const white = [255, 255, 255];
+    return {
+      bg: v('--bg', '#0c0d12'),
+      panel: panel,
+      line: v('--line', '#262a36'),
+      soft: v('--line-soft', '#1c1f29'),
+      fg: v('--fg', '#eef0f6'),
+      dim: v('--fg-dim', '#969cb0'),
+      faint: v('--fg-faint', '#636a80'),
+      accent: accent,
+      // Hintergrund des markierten Blocks: Akzent leicht in die Flaeche gemischt
+      favBg: mix(toRgb(panel), accentRgb, 0.17) || panel,
+      // Schrift darauf: Akzent Richtung Weiss aufgehellt, sonst zu dunkel
+      favFg: mix(accentRgb, white, 0.45) || accent,
+      favDim: mix(accentRgb, white, 0.15) || accent,
+      shade: toRgb(v('--bg', '#0c0d12')),
+    };
+  }
 
   // Zeichnet den Tag als Bild: Markiertes leuchtet, der Rest bleibt lesbar, aber grau.
   function pngForDay(ev, dayId, favIds, partMap) {
+    const C = palette();
     const day = ev.days.find((d) => d.id === dayId) || {};
     const sets = ev.sets
       .filter((s) => s.day === dayId && s._start && s._end)
@@ -271,13 +302,16 @@ window.TTExport = (function () {
           ctx.save();
           roundRect(ctx, x, y, w - 3, h, 6);
           ctx.clip();
-          ctx.fillStyle = 'rgba(12,13,18,0.72)';
+          ctx.fillStyle = C.shade
+            ? 'rgba(' + C.shade.join(',') + ',0.72)'
+            : 'rgba(12,13,18,0.72)';
           if (a > 0.5) ctx.fillRect(x, y, w - 3, a);
           if (h - b > 0.5) ctx.fillRect(x, y + b, w - 3, h - b);
           ctx.restore();
         }
 
-        const textW = w - 16;
+        // Bei markierten Sets sitzt rechts oben der ★ – dafuer Platz lassen.
+        const textW = w - 16 - (fav ? 11 : 0);
         const shownRange = part
           ? TT.fmtTime(part.start) + '–' + TT.fmtTime(part.end)
           : TT.fmtTime(s._start) + '–' + TT.fmtTime(s._end);
@@ -287,7 +321,7 @@ window.TTExport = (function () {
         ctx.fillText(fit(ctx, name, textW), x + 7, y + 5);
 
         if (h > 30) {
-          ctx.fillStyle = fav ? '#c8b25a' : C.faint;
+          ctx.fillStyle = fav ? C.favDim : C.faint;
           ctx.font = '11px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
           ctx.fillText((part ? '\u2702 ' : '') + shownRange, x + 7, y + 21);
         }

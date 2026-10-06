@@ -57,7 +57,10 @@ button, input, select {
   white-space: nowrap;
   transition: background .12s, border-color .12s, color .12s;
 }
-.btn:hover { background: #1d2029; border-color: #343a4a; }
+.btn:hover {
+  background: color-mix(in srgb, var(--fg) 7%, var(--bg-raised));
+  border-color: color-mix(in srgb, var(--fg) 18%, var(--line));
+}
 .btn[aria-pressed="true"], .btn.on {
   background: var(--accent);
   border-color: var(--accent);
@@ -82,7 +85,8 @@ button, input, select {
   position: sticky;
   top: 0;
   z-index: 40;
-  background: rgba(12, 13, 18, .93);
+  background: var(--bg);
+  background: color-mix(in srgb, var(--bg) 93%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
 }
@@ -119,7 +123,11 @@ button, input, select {
   background: var(--bg-raised);
   border: 1px solid var(--line);
 }
-.clock.live { border-color: var(--live); color: #ff8fa3; }
+.clock.live {
+  border-color: var(--live);
+  color: var(--live);
+  color: color-mix(in srgb, var(--live) 70%, #fff);
+}
 .clock.live::before {
   content: "";
   display: inline-block;
@@ -193,10 +201,11 @@ button, input, select {
   flex-wrap: wrap;
   margin: 0 0 14px;
   padding: 11px 14px;
-  border: 1px solid #3a4460;
+  border: 1px solid var(--line);
   border-left: 3px solid var(--accent);
   border-radius: var(--radius);
-  background: #161a26;
+  background: var(--bg-raised);
+  background: color-mix(in srgb, var(--accent) 7%, var(--bg-raised));
 }
 .banner[hidden] { display: none; }
 .banner p { margin: 0; flex: 1 1 220px; font-size: 14px; }
@@ -284,6 +293,7 @@ button, input, select {
   z-index: 18;
   pointer-events: none;
   box-shadow: 0 0 10px rgba(255, 59, 92, .6);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--live) 65%, transparent);
 }
 .nowline::after {
   content: "jetzt";
@@ -314,7 +324,11 @@ button, input, select {
   width: 100%;
   transition: transform .1s, box-shadow .12s, background .12s;
 }
-.set:hover { background: #1e2230; z-index: 12; box-shadow: 0 4px 14px rgba(0, 0, 0, .55); }
+.set:hover {
+  background: color-mix(in srgb, var(--fg) 8%, var(--bg-raised));
+  z-index: 12;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .55);
+}
 .set:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .set .artist {
   font-weight: 600;
@@ -335,14 +349,27 @@ button, input, select {
 .set .meta { display: block; font-size: 10px; color: var(--fg-faint); margin-top: 1px; }
 
 .set.fav {
-  background: linear-gradient(180deg, #3a3005, #241e03);
+  /* Erste Zeile ist der Rueckfall fuer Browser ohne color-mix */
+  background: #23242e;
+  background: color-mix(in srgb, var(--accent) 17%, var(--bg-raised));
   border-color: var(--accent);
-  box-shadow: inset 0 0 0 1px rgba(255, 216, 77, .25);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent) 30%, transparent);
 }
-.set.fav .artist { color: #ffe680; }
-.set.fav .time { color: #c8b25a; }
+.set.fav .artist {
+  color: var(--accent);
+  color: color-mix(in srgb, var(--accent) 45%, #fff);
+}
+.set.fav .time {
+  color: var(--fg-dim);
+  /* Gegen --fg statt --fg-dim gemischt: bei dunklen Akzentfarben reicht der
+     Kontrast sonst nicht fuer die kleine 11px-Zeitangabe. */
+  color: color-mix(in srgb, var(--accent) 38%, var(--fg));
+}
 .set.playing { border-left-color: var(--live); }
-.set.playing .time { color: #ff8fa3; }
+.set.playing .time {
+  color: var(--live);
+  color: color-mix(in srgb, var(--live) 75%, #fff);
+}
 .set.past { opacity: .42; }
 .set.dimmed { opacity: .16; filter: saturate(.3); }
 /* ★ als Einstieg in den Teilbesuch – grosszuegige Trefferflaeche fuers Handy */
@@ -417,7 +444,7 @@ button, input, select {
   text-align: left;
   transition: background .12s;
 }
-.row:hover { background: #1e2230; }
+.row:hover { background: color-mix(in srgb, var(--fg) 8%, var(--bg-raised)); }
 .row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .row .when {
   display: block;
@@ -445,12 +472,21 @@ button, input, select {
 .row.partial { border-left-style: dashed; }
 
 .row.fav {
-  background: linear-gradient(90deg, #332a04, #1a1a22 60%);
+  background: #23242e;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--accent) 20%, var(--bg-raised)),
+    var(--bg-raised) 65%);
   border-color: var(--accent);
 }
 .row.fav .star { color: var(--accent); }
-.row.fav .body .artist { color: #ffe680; }
-.row.playing .when b { color: #ff8fa3; }
+.row.fav .body .artist {
+  color: var(--accent);
+  color: color-mix(in srgb, var(--accent) 45%, #fff);
+}
+.row.playing .when b {
+  color: var(--live);
+  color: color-mix(in srgb, var(--live) 75%, #fff);
+}
 .row.playing .when::after {
   content: "läuft";
   display: inline-block;
@@ -458,7 +494,7 @@ button, input, select {
   padding: 1px 6px;
   border-radius: 99px;
   background: var(--live);
-  color: #fff;
+  color: #0b0b0d;
   font-size: 10px;
   font-weight: 700;
 }
@@ -510,7 +546,12 @@ button, input, select {
   color: inherit;
   transition: border-color .12s, transform .12s;
 }
-.card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.card { border-left: 3px solid var(--card-accent, var(--accent)); }
+.card:hover {
+  border-color: var(--card-accent, var(--accent));
+  transform: translateY(-2px);
+}
+.card h2 { color: var(--card-accent, var(--fg)); }
 .card h2 { margin: 0 0 4px; font-size: 17px; }
 .card .when { color: var(--fg-dim); font-size: 13px; }
 .card .pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 11px; }
@@ -522,7 +563,11 @@ button, input, select {
   font-size: 11px;
   color: var(--fg-dim);
 }
-.card .favcount { color: var(--accent); border-color: #4a3f10; background: #241e03; }
+.card .favcount {
+  color: var(--card-accent, var(--accent));
+  border-color: color-mix(in srgb, var(--card-accent, var(--accent)) 40%, var(--line));
+  background: color-mix(in srgb, var(--card-accent, var(--accent)) 14%, var(--bg-sunken));
+}
 
 /* ---------- Dialog ---------- */
 dialog {

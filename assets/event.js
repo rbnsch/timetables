@@ -34,6 +34,8 @@
     }
 
     const ev = state.ev;
+    // Vor dem ersten Render, damit nichts kurz in der Standardfarbe aufblitzt.
+    TT.applyTheme(ev.theme);
     document.title = ev.name + ' – Timetable';
     $('#evname').textContent = ev.name;
     if (ev.venue) $('#evvenue').textContent = ev.venue;

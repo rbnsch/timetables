@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#0c0d12">
 <title>Timetables</title>
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=3">
 </head>
 <body>
 
@@ -35,8 +35,8 @@
   <p>Favoriten liegen pro Browser lokal, nichts wird hochgeladen.</p>
 </footer>
 
-<script src="assets/core.js"></script>
-<script src="assets/export.js"></script>
+<script src="assets/core.js?v=3"></script>
+<script src="assets/export.js?v=3"></script>
 <script>
 (function () {
   'use strict';
@@ -125,7 +125,9 @@
           ev.sets.filter((s) => s.status !== 'cancelled').length + ' Sets',
         ].map((t) => '<span class="pill">' + TT.escapeHtml(t) + '</span>').join('');
 
-        return '<a class="card" href="event.html?e=' + encodeURIComponent(ev.id) + '">' +
+        const akzent = (ev.theme && ev.theme.accent) || 'var(--accent)';
+        return '<a class="card" href="event.html?e=' + encodeURIComponent(ev.id) + '" ' +
+          'style="--card-accent:' + TT.escapeHtml(akzent) + '">' +
           '<h2>' + TT.escapeHtml(ev.name) + '</h2>' +
           '<div class="when">' + TT.escapeHtml(dateRange(ev)) +
           (ev.venue ? ' · ' + TT.escapeHtml(ev.venue) : '') +

@@ -11,6 +11,7 @@ Kein Server, keine Datenbank, keine Anmeldung.
 - **Teilen-Link**, der den eigenen Plan weitergibt, ohne fremde Favoriten zu überschreiben
 - **Export** als Bild (PNG) oder PDF – markierte Sets hervorgehoben, der Rest ausgegraut
 - **Backup** aller Markierungen als Datei, jederzeit wieder einspielbar
+- **Eigene Farbpalette pro Event** – die ganze Oberfläche nimmt die Farben des Veranstalters an
 
 ## Dateien
 
@@ -52,6 +53,22 @@ Dann <http://localhost:8099> aufrufen.
 4. Nach ein bis zwei Minuten liegt die Seite unter `https://<dein-name>.github.io/timetables/`.
 
 Jeder weitere `git push` (oder jede Änderung über den Web-Editor) ist nach ~30 Sekunden live.
+
+### Nach Code-Änderungen: Version hochzählen
+
+GitHub Pages lässt Browser Dateien 10 Minuten zwischenspeichern. Für **Timetable-Daten** spielt
+das keine Rolle (die werden mit `cache: 'no-cache'` geladen, Absagen kommen sofort an), wohl aber
+für `style.css` und die Skripte.
+
+Deshalb hängt an den Verweisen in `index.html` und `event.html` eine Versionsnummer:
+
+```html
+<link rel="stylesheet" href="assets/style.css?v=3">
+<script src="assets/core.js?v=3"></script>
+```
+
+**Wer etwas in `assets/` ändert, zählt diese Zahl in beiden HTML-Dateien hoch.** Dann laden alle
+sofort die neue Fassung, ohne hartes Neuladen.
 
 ## Neues Event hinzufügen
 
@@ -139,6 +156,86 @@ verlieren alle ihre Markierung für dieses Set – und bereits verschickte Teile
 `dayBoundaryHour: 6` heißt: Alles vor 06:00 gehört zur Nacht des angegebenen Tages.
 Ein Set von 23:00 bis 05:00 am 12.02. läuft also korrekt bis zum Morgen des 13.02.
 Bei einem Open Air, das mittags beginnt und vor Mitternacht endet, kann der Wert auf `0` stehen.
+
+## Farben pro Event
+
+Jede Event-Datei kann einen `theme`-Block haben. Der färbt die komplette Oberfläche um:
+Buttons, markierte Sets, Linien, Hintergrund, die Jetzt-Linie, die Karte auf der Startseite
+und auch den Bild-Export.
+
+```json
+"theme": {
+  "accent":    "#ff2233",
+  "accentFg":  "#ffffff",
+  "bg":        "#0b0a0c",
+  "bgRaised":  "#171418",
+  "bgSunken":  "#080709",
+  "line":      "#332a2e",
+  "lineSoft":  "#241d21",
+  "fg":        "#f7f4f5",
+  "fgDim":     "#a79aa0",
+  "fgFaint":   "#70656b",
+  "live":      "#ffffff"
+}
+```
+
+Alle Schlüssel sind optional – was fehlt, bleibt auf dem Standardwert. Entscheidend sind
+eigentlich nur `accent` (die Hervorhebungsfarbe) und `bg` (der Grundton).
+
+| Schlüssel | Wofür |
+|---|---|
+| `accent` | Markierte Sets, aktive Buttons, Links, ★ |
+| `accentFg` | Schrift **auf** der Akzentfarbe – muss dazu kontrastieren |
+| `bg` / `bgRaised` / `bgSunken` | Seite / Kacheln / Rasterfläche |
+| `line` / `lineSoft` | Rahmen und Stundenlinien |
+| `fg` / `fgDim` / `fgFaint` | Haupttext / Nebentext / Kleinstes |
+| `live` | Jetzt-Linie und laufendes Set – bewusst **anders** als `accent` wählen, sonst verschwimmt beides |
+
+### Fertige Paletten
+
+**Rot/Weiß** (Hive Indoor) · **Schwarzrot** (Gotec) – siehe die beiden Event-Dateien.
+
+**Grün** (z.B. Teletech):
+
+```json
+"theme": {
+  "accent": "#00e676", "accentFg": "#04230f",
+  "bg": "#060b07", "bgRaised": "#101911", "bgSunken": "#040806",
+  "line": "#24382a", "lineSoft": "#18261c",
+  "fg": "#eef6f0", "fgDim": "#96ad9e", "fgFaint": "#63776a",
+  "live": "#ff5252"
+}
+```
+
+**Blau:**
+
+```json
+"theme": {
+  "accent": "#3d9bff", "accentFg": "#04121f",
+  "bg": "#070a0f", "bgRaised": "#101723", "bgSunken": "#050810",
+  "line": "#22304a", "lineSoft": "#172133",
+  "fg": "#eef2f8", "fgDim": "#94a3b8", "fgFaint": "#64748b",
+  "live": "#ff7a45"
+}
+```
+
+**Lila:**
+
+```json
+"theme": {
+  "accent": "#b06bff", "accentFg": "#190a2b",
+  "bg": "#0a070f", "bgRaised": "#171022", "bgSunken": "#070510",
+  "line": "#332247", "lineSoft": "#231731",
+  "fg": "#f2eef8", "fgDim": "#a294b8", "fgFaint": "#6f6383",
+  "live": "#ffd166"
+}
+```
+
+Dazu passen am besten auch die `color`-Angaben der Floors – die bleiben aber bewusst
+unterscheidbar, weil sie die Spalten auseinanderhalten sollen.
+
+Nur einfache Farbangaben werden akzeptiert (`#hex`, `rgb()`, `hsl()`, Farbnamen). Alles andere
+wird ignoriert, ein Tippfehler kann die Seite also nicht zerlegen.
 
 ## Teilbesuche
 

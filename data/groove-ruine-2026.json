@@ -4,14 +4,28 @@
   "venue": "Gotec Club",
   "dayBoundaryHour": 10,
 
+  "theme": {
+    "accent": "#e4242f",
+    "accentFg": "#ffffff",
+    "bg": "#0a0608",
+    "bgRaised": "#1a1013",
+    "bgSunken": "#070406",
+    "line": "#3d2228",
+    "lineSoft": "#28161b",
+    "fg": "#f3eef0",
+    "fgDim": "#ad9298",
+    "fgFaint": "#735c63",
+    "live": "#8fe8ff"
+  },
+
   "days": [
     { "id": "d1", "label": "Samstag", "date": "2026-10-03" }
   ],
 
   "floors": [
-    { "id": "main", "name": "Mainfloor", "color": "#ff6b35" },
-    { "id": "boiler", "name": "Boiler", "color": "#3ddc97" },
-    { "id": "cube", "name": "Cube", "color": "#7b9cff" }
+    { "id": "main", "name": "Mainfloor", "color": "#ff3b30" },
+    { "id": "boiler", "name": "Boiler", "color": "#e8e4e2" },
+    { "id": "cube", "name": "Cube", "color": "#8fd8ff" }
   ],
 
   "sets": [
