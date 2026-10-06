@@ -189,7 +189,7 @@ eigentlich nur `accent` (die Hervorhebungsfarbe) und `bg` (der Grundton).
 | `bg` / `bgRaised` / `bgSunken` | Seite / Kacheln / Rasterfläche |
 | `line` / `lineSoft` | Rahmen und Stundenlinien |
 | `fg` / `fgDim` / `fgFaint` | Haupttext / Nebentext / Kleinstes |
-| `live` | Jetzt-Linie und laufendes Set – bewusst **anders** als `accent` wählen, sonst verschwimmt beides |
+| `live` | Jetzt-Linie und laufendes Set – bewusst **anders** als `accent` wählen, sonst verschwimmt beides. Weiß funktioniert bei roten Paletten gut. |
 
 ### Fertige Paletten
 

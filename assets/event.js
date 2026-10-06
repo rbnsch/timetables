@@ -544,12 +544,17 @@
     el.textContent = shown + ' von ' + total + ' Sets';
   }
 
-  function setClasses(s, matching, now) {
+  // "Vorbei" nur markieren, solange der Tag noch laeuft. Bei einem Event, das
+  // komplett vorueber ist, waere sonst jeder einzelne Block ausgegraut.
+  const tagLaeuftNoch = (sets, now) =>
+    sets.length > 0 && now <= Math.max(...sets.map((x) => +x._end));
+
+  function setClasses(s, matching, now, markPast) {
     const cls = ['set'];
     if (isFav(s)) cls.push('fav');
     if (s.status === 'cancelled') cls.push('cancelled');
     if (now >= s._start && now <= s._end) cls.push('playing');
-    else if (s._end < now) cls.push('past');
+    else if (markPast && s._end < now) cls.push('past');
     if (state.query && !matching.has(s.id)) cls.push('dimmed');
     if (s._dur <= 45) cls.push('short');
     return cls;
@@ -603,6 +608,7 @@
     const ev = state.ev;
     const matching = new Set(matchingList.map((s) => s.id));
     const now = new Date();
+    const markPast = tagLaeuftNoch(sets, now);
     const ppm = parseFloat(getComputedStyle(document.documentElement)
       .getPropertyValue('--ppm')) || 1.6;
 
@@ -649,7 +655,7 @@
         ].join(';');
 
         const part = partFor(s);
-        const cls = setClasses(s, matching, now);
+        const cls = setClasses(s, matching, now, markPast);
         if (part) cls.push('partial');
         const blockH = Math.max(20, s._dur * ppm - 3);
 
@@ -701,6 +707,7 @@
   function renderList(host, sets) {
     const ev = state.ev;
     const now = new Date();
+    const markPast = tagLaeuftNoch(sets, now);
     const floors = ev.floors.filter((f) => sets.some((s) => s.floor === f.id));
     appendOrphanFloors(floors, ev, sets);
 
@@ -717,7 +724,7 @@
         if (isFav(s)) cls.push('fav');
         if (s.status === 'cancelled') cls.push('cancelled');
         if (now >= s._start && now <= s._end) cls.push('playing');
-        else if (s._end < now) cls.push('past');
+        else if (markPast && s._end < now) cls.push('past');
 
         const part = partFor(s);
         if (part) cls.push('partial');

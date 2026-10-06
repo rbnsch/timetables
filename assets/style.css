@@ -370,7 +370,7 @@ button, input, select {
   color: var(--live);
   color: color-mix(in srgb, var(--live) 75%, #fff);
 }
-.set.past { opacity: .42; }
+.set.past { opacity: .62; }
 .set.dimmed { opacity: .16; filter: saturate(.3); }
 /* ★ als Einstieg in den Teilbesuch – grosszuegige Trefferflaeche fuers Handy */
 .set .pin, .row .star {
@@ -498,7 +498,7 @@ button, input, select {
   font-size: 10px;
   font-weight: 700;
 }
-.row.past { opacity: .45; }
+.row.past { opacity: .62; }
 .row.cancelled { opacity: .6; }
 .row.cancelled .body .artist { text-decoration: line-through; }
 
