@@ -1,0 +1,34 @@
+{
+  "id": "groove-ruine-2026",
+  "name": "Groove Ruine",
+  "venue": "Gotec Club",
+  "dayBoundaryHour": 10,
+
+  "days": [
+    { "id": "d1", "label": "Samstag", "date": "2026-10-03" }
+  ],
+
+  "floors": [
+    { "id": "main", "name": "Mainfloor", "color": "#ff6b35" },
+    { "id": "boiler", "name": "Boiler", "color": "#3ddc97" },
+    { "id": "cube", "name": "Cube", "color": "#7b9cff" }
+  ],
+
+  "sets": [
+    { "id": "mf01", "day": "d1", "floor": "main", "artist": "TOWICZ", "start": "22:00", "end": "00:00" },
+    { "id": "mf02", "day": "d1", "floor": "main", "artist": "ALI3N", "start": "00:00", "end": "01:30" },
+    { "id": "mf03", "day": "d1", "floor": "main", "artist": "KOBOYO b2b BESTE HIRA", "start": "01:30", "end": "03:00" },
+    { "id": "mf04", "day": "d1", "floor": "main", "artist": "QUELZA", "start": "03:00", "end": "04:30" },
+    { "id": "mf05", "day": "d1", "floor": "main", "artist": "MARRØN", "start": "04:30", "end": "06:00" },
+    { "id": "mf06", "day": "d1", "floor": "main", "artist": "GRACE DAHL b2b Estella Boersma", "start": "06:00", "end": "08:00" },
+
+    { "id": "bo01", "day": "d1", "floor": "boiler", "genre": "Vinyl only", "artist": "TIGERHEAD", "start": "23:00", "end": "02:00" },
+    { "id": "bo02", "day": "d1", "floor": "boiler", "genre": "Vinyl only", "artist": "SLIN", "start": "02:00", "end": "04:00" },
+    { "id": "bo03", "day": "d1", "floor": "boiler", "genre": "Vinyl only", "artist": "CARMEN ELECTRO", "start": "04:00", "end": "06:00" },
+
+    { "id": "cu01", "day": "d1", "floor": "cube", "artist": "PÆZ", "start": "00:00", "end": "01:30" },
+    { "id": "cu02", "day": "d1", "floor": "cube", "artist": "EUGENE B2B GEHTHARD", "start": "01:30", "end": "03:00" },
+    { "id": "cu03", "day": "d1", "floor": "cube", "artist": "DJ SEXSTASY", "start": "03:00", "end": "04:30" },
+    { "id": "cu04", "day": "d1", "floor": "cube", "artist": "MADMAN", "start": "04:30", "end": "06:00" }
+  ]
+}
