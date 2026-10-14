@@ -63,8 +63,8 @@ für `style.css` und die Skripte.
 Deshalb hängt an den Verweisen in `index.html` und `event.html` eine Versionsnummer:
 
 ```html
-<link rel="stylesheet" href="assets/style.css?v=3">
-<script src="assets/core.js?v=3"></script>
+<link rel="stylesheet" href="assets/style.css?v=5">
+<script src="assets/core.js?v=5"></script>
 ```
 
 **Wer etwas in `assets/` ändert, zählt diese Zahl in beiden HTML-Dateien hoch.** Dann laden alle
@@ -76,7 +76,7 @@ sofort die neue Fassung, ohne hartes Neuladen.
 `data/<event-id>.json` an und trage die Datei in `data/events.json` ein. Hilfreich dabei:
 Datum der Tage und wie die Floors heißen, falls das Bild das nicht hergibt.
 
-**Von Hand:** eine Datei nach dem Muster von `data/hive-indoor-2026.json` anlegen und
+**Von Hand:** eine Datei nach dem Muster von `data/groove-ruine-2026.json` anlegen und
 den Dateinamen in `data/events.json` ergänzen.
 
 > **Achtung beim Teilen:** `index.html` listet *alle* Events aus `events.json` auf. Sobald dort ein
@@ -128,8 +128,8 @@ verlieren alle ihre Markierung für dieses Set – und bereits verschickte Teile
 
 ```jsonc
 {
-  "id": "hive-indoor-2027",          // = Dateiname ohne .json
-  "name": "Hive Indoor Festival",
+  "id": "mein-festival-2027",        // = Dateiname ohne .json
+  "name": "Mein Festival",
   "venue": "Messe Erfurt",           // optional
   "dayBoundaryHour": 6,              // Zeiten vor 06:00 zählen zur Nacht des Tages
 
@@ -197,7 +197,19 @@ eigentlich nur `accent` (die Hervorhebungsfarbe) und `bg` (der Grundton).
 
 ### Fertige Paletten
 
-**Rot/Weiß** (Hive Indoor) · **Schwarzrot** (Gotec) – siehe die beiden Event-Dateien.
+**Schwarzrot** (Gotec) – siehe `data/groove-ruine-2026.json`.
+
+**Rot/Weiß:**
+
+```json
+"theme": {
+  "accent": "#ff2233", "accentFg": "#ffffff",
+  "bg": "#0b0a0c", "bgRaised": "#171418", "bgSunken": "#080709",
+  "line": "#332a2e", "lineSoft": "#241d21",
+  "fg": "#f7f4f5", "fgDim": "#a79aa0", "fgFaint": "#70656b",
+  "live": "#ffffff"
+}
+```
 
 **Grün** (z.B. Teletech):
 
@@ -287,8 +299,8 @@ Das Backup enthält nur Set-IDs, keine Namen:
   "type": "timetable-favorites",
   "version": 2,
   "exported": "2026-10-05T12:00:00.000Z",
-  "favorites": { "hive-indoor-2026": ["tc06", "rb07"] },
-  "partials":  { "hive-indoor-2026": { "tc06": [0, 45] } }
+  "favorites": { "groove-ruine-2026": ["mf03", "bo02"] },
+  "partials":  { "groove-ruine-2026": { "mf03": [0, 45] } }
 }
 ```
 
