@@ -197,7 +197,7 @@ eigentlich nur `accent` (die Hervorhebungsfarbe) und `bg` (der Grundton).
 
 ### Fertige Paletten
 
-**Schwarzrot** (Gotec) – siehe `data/groove-ruine-2026.json`.
+**Schwarzrot** (Groove Ruine) und **Rost/Petrol** (BCCO) – siehe die beiden Event-Dateien.
 
 **Rot/Weiß:**
 

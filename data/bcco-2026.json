@@ -1,0 +1,41 @@
+{
+  "id": "bcco-2026",
+  "name": "BCCO",
+  "venue": "Gotec, Karlsruhe",
+  "dayBoundaryHour": 10,
+
+  "theme": {
+    "accent": "#e07a3f",
+    "accentFg": "#1d0d03",
+    "bg": "#0a0b0b",
+    "bgRaised": "#171818",
+    "bgSunken": "#070808",
+    "line": "#2f3130",
+    "lineSoft": "#1f2120",
+    "fg": "#f3f2ef",
+    "fgDim": "#a3a39d",
+    "fgFaint": "#6d6d68",
+    "live": "#ffffff"
+  },
+
+  "days": [
+    { "id": "d1", "label": "Samstag", "date": "2026-10-17" }
+  ],
+
+  "floors": [
+    { "id": "main", "name": "Main", "color": "#efece4" },
+    { "id": "boiler", "name": "Boiler", "color": "#4ea8a0" }
+  ],
+
+  "sets": [
+    { "id": "mn01", "day": "d1", "floor": "main", "artist": "LILLI&4LOVE", "start": "22:00", "end": "00:00" },
+    { "id": "mn02", "day": "d1", "floor": "main", "artist": "DAVYBOI", "start": "00:00", "end": "02:00" },
+    { "id": "mn03", "day": "d1", "floor": "main", "artist": "PRADA2000", "start": "02:00", "end": "04:00" },
+    { "id": "mn04", "day": "d1", "floor": "main", "artist": "DJ CRINGEY", "start": "04:00", "end": "06:00" },
+    { "id": "mn05", "day": "d1", "floor": "main", "artist": "SAIKA", "start": "06:00", "end": "08:00" },
+
+    { "id": "bl01", "day": "d1", "floor": "boiler", "artist": "MAURER", "start": "00:00", "end": "02:00" },
+    { "id": "bl02", "day": "d1", "floor": "boiler", "artist": "ÜBERKIKZ", "start": "02:00", "end": "04:00" },
+    { "id": "bl03", "day": "d1", "floor": "boiler", "artist": "FENIM0RE", "start": "04:00", "end": "06:00" }
+  ]
+}

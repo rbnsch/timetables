@@ -297,7 +297,11 @@ window.TT = (function () {
     const collapsed = stripped.replace(/ae/g, 'a').replace(/oe/g, 'o').replace(/ue/g, 'u');
     // Ohne Satzzeichen, damit "obi" auch O.B.I. und "vorteks" auch VORTEK'S findet
     const squashed = stripped.replace(/[^a-z0-9]/g, '');
-    return [...new Set([stripped, spelled, collapsed, squashed])].filter(Boolean);
+    // Ziffern-Schreibweisen aufloesen: "alien" findet ALI3N, "fenimore" findet FENIM0RE
+    const deleet = squashed
+      .replace(/0/g, 'o').replace(/1/g, 'i').replace(/3/g, 'e')
+      .replace(/4/g, 'a').replace(/5/g, 's').replace(/7/g, 't');
+    return [...new Set([stripped, spelled, collapsed, squashed, deleet])].filter(Boolean);
   }
 
   function matchesQuery(set, query) {
