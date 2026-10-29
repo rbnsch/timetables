@@ -63,8 +63,8 @@ für `style.css` und die Skripte.
 Deshalb hängt an den Verweisen in `index.html` und `event.html` eine Versionsnummer:
 
 ```html
-<link rel="stylesheet" href="assets/style.css?v=5">
-<script src="assets/core.js?v=5"></script>
+<link rel="stylesheet" href="assets/style.css?v=7">
+<script src="assets/core.js?v=7"></script>
 ```
 
 **Wer etwas in `assets/` ändert, zählt diese Zahl in beiden HTML-Dateien hoch.** Dann laden alle
@@ -197,7 +197,12 @@ eigentlich nur `accent` (die Hervorhebungsfarbe) und `bg` (der Grundton).
 
 ### Fertige Paletten
 
-**Schwarzrot** (Groove Ruine) und **Rost/Petrol** (BCCO) – siehe die beiden Event-Dateien.
+**Schwarzrot** (Groove Ruine), **Rost/Petrol** (BCCO) und **Lavendel auf Neutralgrau**
+(Adrenaline) – siehe die Event-Dateien.
+
+> Dunkle Farben mit kräftigem Blau- oder Violettstich lassen sich schlecht gegenprüfen, weil
+> Screenshot-Werkzeuge sie gern zu Knallblau aufblasen. Im Zweifel neutrale Grautöne für den
+> Hintergrund nehmen und den Charakter über `accent` und die Floor-Farben tragen lassen.
 
 **Rot/Weiß:**
 

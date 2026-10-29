@@ -1,0 +1,46 @@
+{
+  "id": "adrenaline-2026",
+  "name": "Adrenaline Family Tour",
+  "venue": "Gotec, Karlsruhe",
+  "dayBoundaryHour": 10,
+
+  "theme": {
+    "accent": "#a98cff",
+    "accentFg": "#191919",
+    "bg": "#0a0a0a",
+    "bgRaised": "#181818",
+    "bgSunken": "#060606",
+    "line": "#333333",
+    "lineSoft": "#242424",
+    "fg": "#f3f3f3",
+    "fgDim": "#a3a3a3",
+    "fgFaint": "#6e6e6e",
+    "live": "#ffffff"
+  },
+
+  "days": [
+    { "id": "d1", "label": "Freitag", "date": "2026-10-30" }
+  ],
+
+  "floors": [
+    { "id": "main", "name": "Mainfloor", "color": "#b09cff" },
+    { "id": "kode", "name": "KØDE", "color": "#cfd4dc" },
+    { "id": "boiler", "name": "Boiler", "color": "#8d7be0" }
+  ],
+
+  "sets": [
+    { "id": "mf01", "day": "d1", "floor": "main", "artist": "FLACCO", "start": "22:00", "end": "01:30" },
+    { "id": "mf02", "day": "d1", "floor": "main", "artist": "KUKO", "start": "01:30", "end": "03:00" },
+    { "id": "mf03", "day": "d1", "floor": "main", "artist": "CLOUDY", "start": "03:00", "end": "04:30" },
+    { "id": "mf04", "day": "d1", "floor": "main", "artist": "SUSKA", "start": "04:30", "end": "06:00" },
+    { "id": "mf05", "day": "d1", "floor": "main", "artist": "LENE MA RUE", "start": "06:00", "end": "08:00" },
+
+    { "id": "kd01", "day": "d1", "floor": "kode", "artist": "LUZINKA", "start": "23:00", "end": "01:00" },
+    { "id": "kd02", "day": "d1", "floor": "kode", "artist": "GUTKIND", "start": "01:00", "end": "03:00" },
+    { "id": "kd03", "day": "d1", "floor": "kode", "artist": "PANA", "start": "03:00", "end": "05:00" },
+
+    { "id": "bo01", "day": "d1", "floor": "boiler", "artist": "VAGABUND", "start": "00:00", "end": "01:30" },
+    { "id": "bo02", "day": "d1", "floor": "boiler", "artist": "ADRIÁN MILLS", "start": "01:30", "end": "04:30" },
+    { "id": "bo03", "day": "d1", "floor": "boiler", "artist": "DANILO FILIPE", "start": "04:30", "end": "07:00" }
+  ]
+}
