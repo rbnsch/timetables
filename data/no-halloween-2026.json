@@ -1,0 +1,47 @@
+{
+  "id": "no-halloween-2026",
+  "name": "No Halloween",
+  "venue": "Gotec, Karlsruhe",
+  "dayBoundaryHour": 10,
+
+  "theme": {
+    "accent": "#ffffff",
+    "accentFg": "#000000",
+    "bg": "#000000",
+    "bgRaised": "#141414",
+    "bgSunken": "#000000",
+    "line": "#333333",
+    "lineSoft": "#1f1f1f",
+    "fg": "#ffffff",
+    "fgDim": "#9e9e9e",
+    "fgFaint": "#6a6a6a",
+    "live": "#ff3b3b"
+  },
+
+  "days": [
+    { "id": "d1", "label": "Samstag", "date": "2026-10-31" }
+  ],
+
+  "floors": [
+    { "id": "main", "name": "Mainfloor", "color": "#ffffff" },
+    { "id": "boiler", "name": "Boiler", "color": "#b4b4b4" },
+    { "id": "kode", "name": "KØDE", "color": "#787878" }
+  ],
+
+  "sets": [
+    { "id": "mf01", "day": "d1", "floor": "main", "artist": "VSN22", "start": "21:00", "end": "23:00" },
+    { "id": "mf02", "day": "d1", "floor": "main", "artist": "OBSCURE SHAPE", "start": "23:00", "end": "00:30" },
+    { "id": "mf03", "day": "d1", "floor": "main", "artist": "CALLUSH", "start": "00:30", "end": "02:00" },
+    { "id": "mf04", "day": "d1", "floor": "main", "artist": "CHARLIE SPARKS", "start": "02:00", "end": "03:30" },
+    { "id": "mf05", "day": "d1", "floor": "main", "artist": "NEEK", "start": "03:30", "end": "05:00" },
+
+    { "id": "bo01", "day": "d1", "floor": "boiler", "artist": "BTFL", "start": "22:00", "end": "00:00" },
+    { "id": "bo02", "day": "d1", "floor": "boiler", "artist": "DICE", "start": "00:00", "end": "01:30" },
+    { "id": "bo03", "day": "d1", "floor": "boiler", "artist": "ANTONYM", "start": "01:30", "end": "03:00" },
+    { "id": "bo04", "day": "d1", "floor": "boiler", "artist": "NYRA", "start": "03:00", "end": "05:00" },
+
+    { "id": "kd01", "day": "d1", "floor": "kode", "artist": "PØNTI", "start": "00:00", "end": "01:30" },
+    { "id": "kd02", "day": "d1", "floor": "kode", "artist": "ALBA FRANCH", "start": "01:30", "end": "03:00" },
+    { "id": "kd03", "day": "d1", "floor": "kode", "artist": "SAIKA", "start": "03:00", "end": "05:00" }
+  ]
+}
