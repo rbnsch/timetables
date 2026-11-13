@@ -1,0 +1,45 @@
+{
+  "id": "groove-ruine-3-2026",
+  "name": "Groove Ruine 3.0",
+  "venue": "Gotec, Karlsruhe",
+  "dayBoundaryHour": 10,
+
+  "theme": {
+    "accent": "#9dff2f",
+    "accentFg": "#06120a",
+    "bg": "#000000",
+    "bgRaised": "#121212",
+    "bgSunken": "#000000",
+    "line": "#2e2e2e",
+    "lineSoft": "#1c1c1c",
+    "fg": "#f2f2f2",
+    "fgDim": "#a0a0a0",
+    "fgFaint": "#6b6b6b",
+    "live": "#ffffff"
+  },
+
+  "days": [
+    { "id": "d1", "label": "Freitag", "date": "2026-11-13" }
+  ],
+
+  "floors": [
+    { "id": "main", "name": "Mainfloor", "color": "#9dff2f" },
+    { "id": "boiler", "name": "Boiler", "color": "#e6e6e6" },
+    { "id": "cube", "name": "Cube", "color": "#8f8f8f" }
+  ],
+
+  "sets": [
+    { "id": "mf01", "day": "d1", "floor": "main", "genre": "Vinyl only", "artist": "TINO MACHAUER", "start": "22:00", "end": "01:00" },
+    { "id": "mf02", "day": "d1", "floor": "main", "genre": "Vinyl only", "artist": "BLOODY MARY", "start": "01:00", "end": "03:00" },
+    { "id": "mf03", "day": "d1", "floor": "main", "genre": "Vinyl only", "artist": "TARKNO", "start": "03:00", "end": "05:00" },
+    { "id": "mf04", "day": "d1", "floor": "main", "genre": "Vinyl only", "artist": "FREDDY K", "start": "05:00", "end": "08:00" },
+
+    { "id": "bo01", "day": "d1", "floor": "boiler", "artist": "FELICIE", "start": "23:00", "end": "01:00" },
+    { "id": "bo02", "day": "d1", "floor": "boiler", "artist": "TEMUDO", "start": "01:00", "end": "03:00" },
+    { "id": "bo03", "day": "d1", "floor": "boiler", "artist": "ALARICO", "start": "03:00", "end": "05:00" },
+
+    { "id": "cu01", "day": "d1", "floor": "cube", "artist": "ANAHITA SHAMSAEI", "start": "00:00", "end": "02:00" },
+    { "id": "cu02", "day": "d1", "floor": "cube", "artist": "ANNĒ", "start": "02:00", "end": "04:00" },
+    { "id": "cu03", "day": "d1", "floor": "cube", "artist": "KLAPS", "start": "04:00", "end": "06:00" }
+  ]
+}
