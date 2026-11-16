@@ -556,7 +556,8 @@
     if (now >= s._start && now <= s._end) cls.push('playing');
     else if (markPast && s._end < now) cls.push('past');
     if (state.query && !matching.has(s.id)) cls.push('dimmed');
-    if (s._dur <= 45) cls.push('short');
+    // Nur wirklich flache Bloecke verlieren Zeit und Genre – ein 45-min-Set hat dafuer Platz.
+    if (s._dur <= 25) cls.push('short');
     return cls;
   }
 
@@ -628,7 +629,9 @@
 
     const head = floors.map((f) =>
       '<div class="floorname" style="--floor:' + TT.escapeHtml(f.color || 'var(--accent)') + '">' +
-      TT.escapeHtml(f.name || f.id) + '</div>').join('');
+      TT.escapeHtml(f.name || f.id) +
+      (f.mc ? '<span class="mc">' + TT.escapeHtml(f.mc) + '</span>' : '') +
+      '</div>').join('');
 
     let ticks = '', lines = '';
     for (let m = 0; m <= totalMin; m += 30) {
@@ -749,7 +752,9 @@
       return '<section class="list-floor" style="--floor:' +
         TT.escapeHtml(f.color || 'var(--accent)') + '">' +
         '<h2>' + TT.escapeHtml(f.name || f.id) +
-        ' <span class="count">' + mine.length + '</span></h2>' + rows + '</section>';
+        ' <span class="count">' + mine.length + '</span>' +
+        (f.mc ? '<span class="mc">' + TT.escapeHtml(f.mc) + '</span>' : '') +
+        '</h2>' + rows + '</section>';
     }).join('') + '</div>';
 
   }

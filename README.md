@@ -63,8 +63,8 @@ für `style.css` und die Skripte.
 Deshalb hängt an den Verweisen in `index.html` und `event.html` eine Versionsnummer:
 
 ```html
-<link rel="stylesheet" href="assets/style.css?v=7">
-<script src="assets/core.js?v=7"></script>
+<link rel="stylesheet" href="assets/style.css?v=8">
+<script src="assets/core.js?v=8"></script>
 ```
 
 **Wer etwas in `assets/` ändert, zählt diese Zahl in beiden HTML-Dateien hoch.** Dann laden alle
@@ -134,7 +134,8 @@ verlieren alle ihre Markierung für dieses Set – und bereits verschickte Teile
   "dayBoundaryHour": 6,              // Zeiten vor 06:00 zählen zur Nacht des Tages
 
   "days":   [{ "id": "fr", "label": "Freitag", "date": "2027-02-12" }],
-  "floors": [{ "id": "main", "name": "Mainfloor", "color": "#ff4d6d" }],
+  "floors": [{ "id": "main", "name": "Mainfloor", "color": "#ff4d6d",
+               "mc": "MC Villain" }],   // optional, steht klein unter dem Floor-Namen
 
   "sets": [
     {
@@ -156,6 +157,12 @@ verlieren alle ihre Markierung für dieses Set – und bereits verschickte Teile
 `dayBoundaryHour: 6` heißt: Alles vor 06:00 gehört zur Nacht des angegebenen Tages.
 Ein Set von 23:00 bis 05:00 am 12.02. läuft also korrekt bis zum Morgen des 13.02.
 Bei einem Open Air, das mittags beginnt und vor Mitternacht endet, kann der Wert auf `0` stehen.
+
+### Sehr kurze Sets
+
+Blöcke bis 25 Minuten sind im Raster zu flach für mehr als den Namen – dort blendet die
+Seite Uhrzeit und Genre aus (`.set.short`). In der Listenansicht steht immer alles.
+Wer hier etwas ändert: Die Schwelle steht in `assets/event.js` in `setClasses`.
 
 ## Farben pro Event
 

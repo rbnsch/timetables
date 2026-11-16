@@ -248,6 +248,14 @@ button, input, select {
   text-overflow: ellipsis;
 }
 .grid-head .floorname:last-child { border-right: 0; }
+/* Optionales "mc" im Floor: eigene Zeile, damit der Floorname nicht abgeschnitten wird. */
+.grid-head .floorname .mc {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--fg-faint);
+}
 
 .grid-body { display: flex; position: relative; padding: 11px 0; }
 
@@ -426,6 +434,7 @@ button, input, select {
   background: var(--floor, var(--accent));
 }
 .list-floor h2 .count { color: var(--fg-faint); font-size: 12px; font-weight: 400; }
+.list-floor h2 .mc { color: var(--fg-faint); font-size: 12px; font-weight: 400; }
 
 .row {
   display: flex;

@@ -1,0 +1,83 @@
+{
+  "id": "hardshift-2026",
+  "name": "Hard Shift – The Pendulum",
+  "venue": "Zenith, München",
+  "dayBoundaryHour": 10,
+
+  "theme": {
+    "accent": "#d9a441",
+    "accentFg": "#1a1206",
+    "bg": "#0a0806",
+    "bgRaised": "#171310",
+    "bgSunken": "#060504",
+    "line": "#3a2f22",
+    "lineSoft": "#241d15",
+    "fg": "#f2ece3",
+    "fgDim": "#aa9d8a",
+    "fgFaint": "#6f6557",
+    "live": "#ff4f3a"
+  },
+
+  "days": [
+    { "id": "d1", "label": "Freitag", "date": "2026-12-04" }
+  ],
+
+  "floors": [
+    { "id": "arc", "name": "The Arc", "mc": "MC Villain", "color": "#c9a158" },
+    { "id": "engine", "name": "The Engine", "mc": "MC Livid", "color": "#a8697a" },
+    { "id": "hells", "name": "Hells Kitchen", "mc": "MC Novy", "color": "#9e9e9e" },
+    { "id": "time", "name": "Time Machine", "mc": "MC Ruffian", "color": "#85a473" }
+  ],
+
+  "sets": [
+    { "id": "a01", "day": "d1", "floor": "arc", "artist": "RAPTVRE", "start": "17:00", "end": "18:00" },
+    { "id": "a02", "day": "d1", "floor": "arc", "artist": "VILLAIN", "genre": "DJ Set", "start": "18:00", "end": "18:45" },
+    { "id": "a03", "day": "d1", "floor": "arc", "artist": "ZELECTER", "genre": "Classics", "start": "18:45", "end": "19:30" },
+    { "id": "a04", "day": "d1", "floor": "arc", "artist": "MAXTREME", "start": "19:30", "end": "20:15" },
+    { "id": "a05", "day": "d1", "floor": "arc", "artist": "PHUTURE NOIZE", "genre": "Classics", "start": "20:15", "end": "21:15" },
+    { "id": "a06", "day": "d1", "floor": "arc", "artist": "SOUND RUSH", "start": "21:15", "end": "22:15" },
+    { "id": "a07", "day": "d1", "floor": "arc", "artist": "D-BLOCK & S-TE-FAN", "start": "22:15", "end": "23:15" },
+    { "id": "a08", "day": "d1", "floor": "arc", "artist": "TNT", "start": "23:15", "end": "00:15" },
+    { "id": "a09", "day": "d1", "floor": "arc", "artist": "SUB ZERO PROJECT", "start": "00:15", "end": "01:15" },
+    { "id": "a10", "day": "d1", "floor": "arc", "artist": "REBELION", "start": "01:15", "end": "02:15" },
+    { "id": "a11", "day": "d1", "floor": "arc", "artist": "DUAL DAMAGE", "start": "02:15", "end": "03:15" },
+    { "id": "a12", "day": "d1", "floor": "arc", "artist": "THE SAINTS", "start": "03:15", "end": "04:00" },
+    { "id": "a13", "day": "d1", "floor": "arc", "artist": "KROWDEXX", "start": "04:00", "end": "05:00" },
+
+    { "id": "e01", "day": "d1", "floor": "engine", "artist": "OUTLINED", "start": "17:00", "end": "18:00" },
+    { "id": "e02", "day": "d1", "floor": "engine", "artist": "DIKKE BAAP", "start": "18:00", "end": "19:00" },
+    { "id": "e03", "day": "d1", "floor": "engine", "artist": "MAD DOG", "start": "19:00", "end": "20:00" },
+    { "id": "e04", "day": "d1", "floor": "engine", "artist": "ANDEREX VS EXPROZ", "start": "20:00", "end": "21:00" },
+    { "id": "e05", "day": "d1", "floor": "engine", "artist": "VIEZE ASBAK", "start": "21:00", "end": "22:00" },
+    { "id": "e06", "day": "d1", "floor": "engine", "artist": "KRUELTY", "start": "22:00", "end": "23:00" },
+    { "id": "e07", "day": "d1", "floor": "engine", "artist": "JAZZY VS YOSHIKO", "start": "23:00", "end": "00:00" },
+    { "id": "e08", "day": "d1", "floor": "engine", "artist": "PAUL ELSTAK FT. BOOGSHE", "start": "00:00", "end": "01:00" },
+    { "id": "e09", "day": "d1", "floor": "engine", "artist": "ANGERFIST", "start": "01:00", "end": "02:00" },
+    { "id": "e10", "day": "d1", "floor": "engine", "artist": "MISS K8", "start": "02:00", "end": "03:00" },
+    { "id": "e11", "day": "d1", "floor": "engine", "artist": "DR DONK VS DIMITRI K", "start": "03:00", "end": "04:00" },
+    { "id": "e12", "day": "d1", "floor": "engine", "artist": "NOISEFLOW", "start": "04:00", "end": "05:00" },
+
+    { "id": "h01", "day": "d1", "floor": "hells", "artist": "MEISTER SÄGE VS SPINSATION", "start": "18:30", "end": "18:45" },
+    { "id": "h02", "day": "d1", "floor": "hells", "artist": "MEISTER SÄGE", "start": "18:45", "end": "19:00" },
+    { "id": "h03", "day": "d1", "floor": "hells", "artist": "BREATHLESS", "start": "19:00", "end": "20:00" },
+    { "id": "h04", "day": "d1", "floor": "hells", "artist": "MORE KORDS", "start": "20:00", "end": "21:00" },
+    { "id": "h05", "day": "d1", "floor": "hells", "artist": "NAMARA VS SAKYRA", "start": "21:00", "end": "22:00" },
+    { "id": "h06", "day": "d1", "floor": "hells", "artist": "TOZA", "start": "22:00", "end": "23:00" },
+    { "id": "h07", "day": "d1", "floor": "hells", "artist": "KILI", "start": "23:00", "end": "00:00" },
+    { "id": "h08", "day": "d1", "floor": "hells", "artist": "LEKKERFACES", "start": "00:00", "end": "01:00" },
+    { "id": "h09", "day": "d1", "floor": "hells", "artist": "THE DARK HORROR", "start": "01:00", "end": "02:00" },
+    { "id": "h10", "day": "d1", "floor": "hells", "artist": "NOMAD", "start": "02:00", "end": "03:00" },
+    { "id": "h11", "day": "d1", "floor": "hells", "artist": "VICIOUZ VS BRAINSTORM", "genre": "All you can play", "start": "03:00", "end": "04:00" },
+    { "id": "h12", "day": "d1", "floor": "hells", "artist": "INVADERZ", "start": "04:00", "end": "05:00" },
+
+    { "id": "t01", "day": "d1", "floor": "time", "artist": "LEALX", "start": "19:00", "end": "20:00" },
+    { "id": "t02", "day": "d1", "floor": "time", "artist": "GABBERTANTE", "start": "20:00", "end": "21:00" },
+    { "id": "t03", "day": "d1", "floor": "time", "artist": "RUFFIAN", "genre": "DJ Set", "start": "21:00", "end": "22:00" },
+    { "id": "t04", "day": "d1", "floor": "time", "artist": "WINDOWS95MAN", "start": "22:00", "end": "23:00" },
+    { "id": "t05", "day": "d1", "floor": "time", "artist": "PROMO", "start": "23:00", "end": "00:15" },
+    { "id": "t06", "day": "d1", "floor": "time", "artist": "NEOPHYTE", "start": "00:15", "end": "01:30" },
+    { "id": "t07", "day": "d1", "floor": "time", "artist": "EVIL ACTIVITIES", "genre": "Millenium Set", "start": "01:30", "end": "02:45" },
+    { "id": "t08", "day": "d1", "floor": "time", "artist": "MARC ACARDIPANE", "start": "02:45", "end": "04:00" },
+    { "id": "t09", "day": "d1", "floor": "time", "artist": "SIMON SAYS", "start": "04:00", "end": "05:00" }
+  ]
+}
