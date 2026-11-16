@@ -63,8 +63,8 @@ für `style.css` und die Skripte.
 Deshalb hängt an den Verweisen in `index.html` und `event.html` eine Versionsnummer:
 
 ```html
-<link rel="stylesheet" href="assets/style.css?v=10">
-<script src="assets/core.js?v=10"></script>
+<link rel="stylesheet" href="assets/style.css?v=11">
+<script src="assets/core.js?v=11"></script>
 ```
 
 **Wer etwas in `assets/` ändert, zählt diese Zahl in beiden HTML-Dateien hoch.** Dann laden alle
@@ -170,10 +170,17 @@ Die Rangfolge ist dabei fest:
 2. Die Uhrzeit – die steht auch an der Zeitachse links.
 3. Das Genre.
 
-Reicht der Platz nicht, fällt also erst das Genre weg (`nometa`), dann die Uhrzeit
-(`short`), dann wird die Schrift kleiner (`squeeze`). Erst wenn auch das nicht reicht –
-bei einem 15-Minuten-Block mit 18 px Höhe – wird der Name mit Auslassungspunkten gekappt.
-Vollständig steht er dann in der Listenansicht und als Tooltip am Block.
+Reicht der Platz nicht, greifen vier Stufen in genau dieser Reihenfolge: Genre weg
+(`nometa`), Namensschrift auf 11 px (`squeeze`), Ränder enger (`tight`), Uhrzeit weg
+(`short`). **Die beiden mittleren Stufen kosten nur Lesbarkeit, die letzte kostet
+Information** – darum kommen sie davor. Ein Beispiel aus Hard Shift: `VICIOUZ VS
+BRAINSTORM` braucht drei Zeilen; in 11 px passen die neben die Uhrzeit, in 12 px nicht.
+Zuerst kleiner zu schreiben rettet dort die Uhrzeit, und bei markierten Sets (der ★ nimmt
+11 px Textbreite) gleich reihenweise.
+
+Erst wenn auch das nicht reicht – bei einem 15-Minuten-Block mit 20 px Höhe – wird der
+Name mit Auslassungspunkten gekappt. Vollständig steht er dann in der Listenansicht und
+als Tooltip am Block.
 
 Wie viele Zeilen der Name bekommt, rechnet `zeilenPlatz()` pro Block aus und schreibt es
 als `--zeilen` in den Block; die CSS liest das in `-webkit-line-clamp`. **Keine feste Zahl

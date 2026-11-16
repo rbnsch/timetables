@@ -448,15 +448,18 @@ button, input, select {
    dann nicht mehr messen. Lieber ueberlaufen lassen; fitBlocks() raeumt auf. */
 .set > span { flex: 0 0 auto; }
 
-/* Drei Stufen, die fitBlocks() nach echter Hoehe vergibt – zuerst faellt das
-   Genre weg, dann die Uhrzeit, zuletzt wird der Name kleiner. */
+/* Vier Stufen, die fitBlocks() nach echter Hoehe vergibt. Die Reihenfolge ist die
+   Rangfolge im Block: erst faellt das Genre, dann wird der Name kleiner, dann
+   ruecken die Raender zusammen. Erst wenn das alles nicht reicht, geht die
+   Uhrzeit – die beiden mittleren Stufen kosten Lesbarkeit, die letzte kostet
+   Information. */
 .set.nometa .meta { display: none; }
-.set.short { padding: 2px 6px; }
-.set.short .time, .set.short .meta { display: none; }
-/* Letzte Stufe: kleinere Schrift, damit mehr Zeilen in den Balken passen.
-   Reicht auch das nicht, kappt fitBlocks() mit Auslassungspunkten – vollstaendig
-   steht der Name in der Listenansicht und im Tooltip. */
+/* Kleinere Schrift bringt beides: mehr Zeilen in den Block und kuerzere Zeilen. */
 .set.squeeze .artist { font-size: 11px; line-height: 1.15; }
+.set.tight { padding: 2px 6px; }
+/* Reicht auch das nicht, kappt fitBlocks() den Namen mit Auslassungspunkten –
+   vollstaendig steht er in der Listenansicht und im Tooltip. */
+.set.short .time, .set.short .meta { display: none; }
 
 /* ---------- Listenansicht ---------- */
 .list { display: flex; flex-direction: column; gap: 22px; }

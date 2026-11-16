@@ -704,7 +704,7 @@
   function fitBlocks(host) {
     const blocks = Array.prototype.slice.call(host.querySelectorAll('.set'));
     blocks.forEach((el) => {
-      el.classList.remove('starroom', 'nometa', 'short', 'squeeze');
+      el.classList.remove('starroom', 'nometa', 'squeeze', 'tight', 'short');
       // Erst ungekuerzt messen, sonst zaehlt man die Kuerzung von eben mit.
       el.style.setProperty('--zeilen', '99');
     });
@@ -719,14 +719,17 @@
     const nameAbgeschnitten = (el) =>
       zeilenPlatz(el) < textZeilen(el.querySelector('.artist')).length;
 
+    // Reihenfolge = Rangfolge: Genre weg, Name kleiner, Raender enger – und erst
+    // ganz zuletzt die Uhrzeit. Kleinere Schrift kostet nur Lesbarkeit, eine
+    // fehlende Uhrzeit kostet Information. "VICIOUZ VS BRAINSTORM" braucht drei
+    // Zeilen; in 11px passen die neben die Uhrzeit, in 12px nicht.
     // Jede Stufe erst komplett setzen, dann neu messen – sonst rechnet der
     // Browser pro Block einmal das Layout neu.
     let rest = blocks.filter(nameAbgeschnitten);
-    rest.forEach((el) => el.classList.add('nometa'));
-    rest = rest.filter(nameAbgeschnitten);
-    rest.forEach((el) => el.classList.add('short'));
-    rest = rest.filter(nameAbgeschnitten);
-    rest.forEach((el) => el.classList.add('squeeze'));
+    ['nometa', 'squeeze', 'tight', 'short'].forEach((stufe) => {
+      rest.forEach((el) => el.classList.add(stufe));
+      rest = rest.filter(nameAbgeschnitten);
+    });
 
     // Die Stufen haben den Umbruch veraendert – "DR DONK VS DIMITRI K" rutscht
     // erst jetzt unter den ★. Nachreservieren, aber nur wenn der Name dadurch
