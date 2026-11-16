@@ -63,8 +63,8 @@ für `style.css` und die Skripte.
 Deshalb hängt an den Verweisen in `index.html` und `event.html` eine Versionsnummer:
 
 ```html
-<link rel="stylesheet" href="assets/style.css?v=8">
-<script src="assets/core.js?v=8"></script>
+<link rel="stylesheet" href="assets/style.css?v=9">
+<script src="assets/core.js?v=9"></script>
 ```
 
 **Wer etwas in `assets/` ändert, zählt diese Zahl in beiden HTML-Dateien hoch.** Dann laden alle
@@ -171,6 +171,20 @@ Name hängt als Tooltip am Block.
 Wichtig dabei: `.set > span { flex: 0 0 auto }` in der CSS. Ohne das schrumpfen Name, Zeit
 und Genre gemeinsam, bis der Name mitten im Buchstaben abgeschnitten ist – und weil nichts
 überläuft, kann `fitBlocks()` das dann auch nicht mehr erkennen.
+
+### Platz für den ★
+
+Der ★ markierter Sets liegt oben rechts **im** Block, nicht daneben. Pauschal Platz
+freizuhalten würde jeden markierten Block 11 px Textbreite kosten – am Handy ist die Spalte
+nur 96 px breit, das wäre jeder achte Buchstabe.
+
+`fitBlocks()` prüft darum per `Range`, welche Textzeile tatsächlich unter dem Zeichen
+durchläuft, und vergibt nur diesen Blöcken die Klasse `starroom`. Bei Hard Shift sind das
+am Handy 3 von 14 markierten Sets, am Desktop 2.
+
+Dazu gehört `.set .pin { max-height: 100% }`: Der ★ ist absolut positioniert und zählt
+damit in `scrollHeight` mit. Ein 18 px hoher 15-Minuten-Block hat sonst 28 px gemeldet,
+und `fitBlocks()` hat gekürzt, obwohl der Text längst passte.
 
 ## Farben pro Event
 

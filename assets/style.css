@@ -370,6 +370,10 @@ button, input, select {
    Schrift wirkt neben weissem Text dunkler – also traegt die Hervorhebung
    der Hintergrund, und der Text geht auf reines Weiss plus Fettung. */
 .set.fav .artist { color: #fff; font-weight: 700; }
+/* Platz fuer den ★ – vergibt fitBlocks() nur an Bloecke, deren Name sonst
+   darunter durchlaeuft. Pauschal waere es 11px Textbreite auf jedem
+   markierten Block, und am Handy ist die Spalte nur 96px breit. */
+.set.starroom .artist { padding-right: 11px; }
 .set.fav .time {
   color: #e8e8e8;
   color: color-mix(in srgb, #fff 82%, var(--accent));
@@ -387,9 +391,11 @@ button, input, select {
   top: 0; right: 0;
   width: 30px; height: 28px;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
+  /* Trefferflaeche bleibt 30x28, das Zeichen selbst rueckt in die Ecke –
+     so muss der Name nur 11px freihalten statt 15px. */
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 4px 5px 0 0;
   border: 0;
   background: none;
   color: var(--accent);
@@ -398,6 +404,11 @@ button, input, select {
   cursor: pointer;
   z-index: 3;
 }
+/* Der ★ ist absolut positioniert und zaehlt damit in scrollHeight mit. Bei einem
+   18px hohen 15-Minuten-Block hat fitBlocks() sonst 28px gemessen und gekuerzt,
+   obwohl der Text laengst passte. Groesser als der Block kann die Flaeche ohnehin
+   nicht werden, ohne den Nachbarn zu ueberdecken. */
+.set .pin { max-height: 100%; }
 .set .pin:hover { transform: scale(1.25); }
 .set .pin:focus-visible, .row .star:focus-visible {
   outline: 2px solid var(--accent);
@@ -485,6 +496,10 @@ button, input, select {
   position: static;
   flex: 0 0 auto;
   align-self: center;
+  /* In der Liste steht der ★ in einer eigenen Spalte – dort mittig statt in der Ecke. */
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   width: 38px; height: 38px;
   font-size: 18px;
   color: var(--line);

@@ -703,7 +703,22 @@
   // Handy zwei Zeilen. Darum nach dem Rendern messen statt nach Minuten schaetzen.
   function fitBlocks(host) {
     const blocks = Array.prototype.slice.call(host.querySelectorAll('.set'));
-    blocks.forEach((el) => el.classList.remove('nometa', 'short', 'squeeze'));
+    blocks.forEach((el) => el.classList.remove('starroom', 'nometa', 'short', 'squeeze'));
+
+    // Der ★ liegt oben rechts IM Block, nicht daneben. Platz dafuer kostet
+    // Textbreite, also nur dort freihalten, wo eine Zeile wirklich darunter
+    // laeuft: "D-BLOCK &" bleibt davor stehen, "ANDEREX VS" nicht.
+    blocks.forEach((el) => {
+      const stern = el.querySelector('.pin');
+      const name = el.querySelector('.artist');
+      if (!stern || !name) return;
+      const g = textRect(stern);
+      if (!g) return;
+      if (textZeilen(name).some((z) =>
+        z.right > g.left - 2 && z.bottom > g.top + 2 && z.top < g.bottom - 2
+      )) el.classList.add('starroom');
+    });
+
     const zuHoch = (el) => el.scrollHeight > el.clientHeight;
 
     // Jede Stufe erst komplett setzen, dann neu messen – sonst rechnet der
@@ -714,6 +729,22 @@
     rest.forEach((el) => el.classList.add('short'));
     rest = rest.filter(zuHoch);
     rest.forEach((el) => el.classList.add('squeeze'));
+  }
+
+  // Umbrueche sind erst nach dem Layout bekannt – ein Range liefert pro
+  // Textzeile ein eigenes Rechteck, das Element selbst nur die Huelle.
+  function textZeilen(el) {
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    return Array.prototype.slice.call(r.getClientRects());
+  }
+
+  // Die Flaeche des ★ ist 30x28 gross, das Zeichen darin nur ein Dutzend Pixel.
+  function textRect(el) {
+    const r = document.createRange();
+    r.selectNodeContents(el);
+    const box = r.getBoundingClientRect();
+    return box.width ? box : null;
   }
 
   function maybeScrollToNow() {
