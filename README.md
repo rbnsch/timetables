@@ -63,8 +63,8 @@ für `style.css` und die Skripte.
 Deshalb hängt an den Verweisen in `index.html` und `event.html` eine Versionsnummer:
 
 ```html
-<link rel="stylesheet" href="assets/style.css?v=9">
-<script src="assets/core.js?v=9"></script>
+<link rel="stylesheet" href="assets/style.css?v=10">
+<script src="assets/core.js?v=10"></script>
 ```
 
 **Wer etwas in `assets/` ändert, zählt diese Zahl in beiden HTML-Dateien hoch.** Dann laden alle
@@ -163,14 +163,30 @@ Bei einem Open Air, das mittags beginnt und vor Mitternacht endet, kann der Wert
 Kurze Sets ergeben flache Blöcke, in die nicht alles passt – am Handy noch weniger als am
 Desktop, weil die Spalten schmaler sind und lange Namen dort zweizeilig werden.
 
-`fitBlocks()` in `assets/event.js` misst deshalb nach jedem Rendern die echte Höhe und nimmt
-nur so viel weg wie nötig: erst das Genre, dann die Uhrzeit, zuletzt wird der Name kleiner
-und mit Auslassungspunkten gekappt. In der Listenansicht steht immer alles, und der volle
-Name hängt als Tooltip am Block.
+`fitBlocks()` in `assets/event.js` misst deshalb nach jedem Rendern, was wirklich passt.
+Die Rangfolge ist dabei fest:
 
-Wichtig dabei: `.set > span { flex: 0 0 auto }` in der CSS. Ohne das schrumpfen Name, Zeit
-und Genre gemeinsam, bis der Name mitten im Buchstaben abgeschnitten ist – und weil nichts
-überläuft, kann `fitBlocks()` das dann auch nicht mehr erkennen.
+1. **Der Name steht vollständig.** Er wird als Letztes angetastet.
+2. Die Uhrzeit – die steht auch an der Zeitachse links.
+3. Das Genre.
+
+Reicht der Platz nicht, fällt also erst das Genre weg (`nometa`), dann die Uhrzeit
+(`short`), dann wird die Schrift kleiner (`squeeze`). Erst wenn auch das nicht reicht –
+bei einem 15-Minuten-Block mit 18 px Höhe – wird der Name mit Auslassungspunkten gekappt.
+Vollständig steht er dann in der Listenansicht und als Tooltip am Block.
+
+Wie viele Zeilen der Name bekommt, rechnet `zeilenPlatz()` pro Block aus und schreibt es
+als `--zeilen` in den Block; die CSS liest das in `-webkit-line-clamp`. **Keine feste Zahl
+nehmen:** Ein 60-Minuten-Block hat am Handy Platz für drei Namenszeilen, ein
+45-Minuten-Block für zwei, und mit sichtbarer Uhrzeit jeweils eine weniger.
+
+Zwei CSS-Regeln, ohne die das Messen nicht funktioniert:
+
+- `.set > span { flex: 0 0 auto }` – sonst schrumpfen Name, Zeit und Genre gemeinsam, bis
+  der Name mitten im Buchstaben abgeschnitten ist, und nichts läuft über, was man messen
+  könnte.
+- `.set .time { white-space: nowrap }` – bei einem Teilbesuch steht ein ✂ vor der Uhrzeit.
+  Umbricht die Zeile, nimmt sie dem Namen eine Zeile weg.
 
 ### Platz für den ★
 
@@ -178,9 +194,15 @@ Der ★ markierter Sets liegt oben rechts **im** Block, nicht daneben. Pauschal 
 freizuhalten würde jeden markierten Block 11 px Textbreite kosten – am Handy ist die Spalte
 nur 96 px breit, das wäre jeder achte Buchstabe.
 
-`fitBlocks()` prüft darum per `Range`, welche Textzeile tatsächlich unter dem Zeichen
-durchläuft, und vergibt nur diesen Blöcken die Klasse `starroom`. Bei Hard Shift sind das
-am Handy 3 von 14 markierten Sets, am Desktop 2.
+`sternLiegtAufName()` prüft darum per `Range`, welche Textzeile das Zeichen tatsächlich
+überdeckt, und nur diese Blöcke bekommen die Klasse `starroom`. Erst ab 2 px Überdeckung:
+„D-BLOCK &" endet 0,2 px vor dem ★, und dafür 11 px zu opfern würde den Namen eine Zeile
+länger machen und damit die Uhrzeit kosten.
+
+Geprüft wird zweimal – einmal vor den Stufen und einmal danach, weil die Stufen den
+Umbruch verändern. Im zweiten Durchgang gilt die Rangfolge von oben: Platz bekommt nur,
+wer dadurch nicht den Namen verliert. Ein ★, der die letzten Buchstaben streift, ist
+besser als ein abgeschnittener Name.
 
 Dazu gehört `.set .pin { max-height: 100% }`: Der ★ ist absolut positioniert und zählt
 damit in `scrollHeight` mit. Ein 18 px hoher 15-Minuten-Block hat sonst 28 px gemeldet,

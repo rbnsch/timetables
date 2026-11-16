@@ -703,32 +703,80 @@
   // Handy zwei Zeilen. Darum nach dem Rendern messen statt nach Minuten schaetzen.
   function fitBlocks(host) {
     const blocks = Array.prototype.slice.call(host.querySelectorAll('.set'));
-    blocks.forEach((el) => el.classList.remove('starroom', 'nometa', 'short', 'squeeze'));
+    blocks.forEach((el) => {
+      el.classList.remove('starroom', 'nometa', 'short', 'squeeze');
+      // Erst ungekuerzt messen, sonst zaehlt man die Kuerzung von eben mit.
+      el.style.setProperty('--zeilen', '99');
+    });
 
     // Der ★ liegt oben rechts IM Block, nicht daneben. Platz dafuer kostet
     // Textbreite, also nur dort freihalten, wo eine Zeile wirklich darunter
     // laeuft: "D-BLOCK &" bleibt davor stehen, "ANDEREX VS" nicht.
-    blocks.forEach((el) => {
-      const stern = el.querySelector('.pin');
-      const name = el.querySelector('.artist');
-      if (!stern || !name) return;
-      const g = textRect(stern);
-      if (!g) return;
-      if (textZeilen(name).some((z) =>
-        z.right > g.left - 2 && z.bottom > g.top + 2 && z.top < g.bottom - 2
-      )) el.classList.add('starroom');
-    });
+    blocks.forEach((el) => { if (sternLiegtAufName(el)) el.classList.add('starroom'); });
 
-    const zuHoch = (el) => el.scrollHeight > el.clientHeight;
+    // Der Name hat Vorrang vor Uhrzeit und Genre: gekuerzt wird erst, wenn auch
+    // ohne die beiden nicht alle Namenszeilen in den Block passen.
+    const nameAbgeschnitten = (el) =>
+      zeilenPlatz(el) < textZeilen(el.querySelector('.artist')).length;
 
     // Jede Stufe erst komplett setzen, dann neu messen – sonst rechnet der
     // Browser pro Block einmal das Layout neu.
-    let rest = blocks.filter(zuHoch);
+    let rest = blocks.filter(nameAbgeschnitten);
     rest.forEach((el) => el.classList.add('nometa'));
-    rest = rest.filter(zuHoch);
+    rest = rest.filter(nameAbgeschnitten);
     rest.forEach((el) => el.classList.add('short'));
-    rest = rest.filter(zuHoch);
+    rest = rest.filter(nameAbgeschnitten);
     rest.forEach((el) => el.classList.add('squeeze'));
+
+    // Die Stufen haben den Umbruch veraendert – "DR DONK VS DIMITRI K" rutscht
+    // erst jetzt unter den ★. Nachreservieren, aber nur wenn der Name dadurch
+    // nicht verlorengeht: ein angeschnittener Name ist schlimmer als ein ★,
+    // der die letzten Buchstaben streift.
+    blocks.forEach((el) => {
+      if (el.classList.contains('starroom') || !sternLiegtAufName(el)) return;
+      el.classList.add('starroom');
+      if (nameAbgeschnitten(el)) el.classList.remove('starroom');
+    });
+
+    // Erst alles messen, dann alles schreiben – sonst stoesst jede Zuweisung
+    // ein neues Layout an.
+    const platz = blocks.map(zeilenPlatz);
+    blocks.forEach((el, i) => el.style.setProperty('--zeilen', String(Math.max(1, platz[i]))));
+  }
+
+  // Beruehrt eine Namenszeile das ★-Zeichen? Nicht die 30x28 grosse
+  // Trefferflaeche, sondern das Dutzend Pixel, das man wirklich sieht – und erst
+  // ab 2px Ueberdeckung, sonst loest schon ein Name aus, der davor endet.
+  function sternLiegtAufName(el) {
+    const stern = el.querySelector('.pin');
+    const name = el.querySelector('.artist');
+    if (!stern || !name) return false;
+    const g = textRect(stern);
+    if (!g) return false;
+    return textZeilen(name).some((z) =>
+      z.right > g.left + 2 && z.bottom > g.top + 2 && z.top < g.bottom - 2);
+  }
+
+  // Wie viele Namenszeilen in den Block passen – was Uhrzeit und Genre belegen,
+  // geht ab. Eine feste Zahl waere wieder nur geraten: ein 60-Minuten-Block hat
+  // am Handy Platz fuer drei Zeilen, ein 45-Minuten-Block fuer zwei.
+  // Kann 0 werden: dann passt neben Uhrzeit und Genre nicht mal eine Zeile.
+  function zeilenPlatz(el) {
+    const name = el.querySelector('.artist');
+    if (!name) return 1;
+    const cs = getComputedStyle(el);
+    const lh = parseFloat(getComputedStyle(name).lineHeight) || 16;
+    let belegt = 0;
+    Array.prototype.slice.call(el.children).forEach((kind) => {
+      if (kind === name) return;
+      const ks = getComputedStyle(kind);
+      // ★ und Teilbesuch-Schatten liegen ueber dem Block, nicht darin.
+      if (ks.position === 'absolute' || ks.display === 'none') return;
+      belegt += kind.offsetHeight + (parseFloat(ks.marginTop) || 0);
+    });
+    const frei = el.clientHeight
+      - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - belegt;
+    return Math.floor((frei + 0.5) / lh);
   }
 
   // Umbrueche sind erst nach dem Layout bekannt – ein Range liefert pro

@@ -347,7 +347,9 @@ button, input, select {
   overflow-wrap: anywhere;
   overflow: hidden;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  /* Wie viele Zeilen wirklich passen, rechnet fitBlocks() pro Block aus. Die 2
+     greift nur, bis das Skript gelaufen ist. */
+  -webkit-line-clamp: var(--zeilen, 2);
   -webkit-box-orient: vertical;
 }
 .set .time {
@@ -356,8 +358,20 @@ button, input, select {
   color: var(--fg-dim);
   font-variant-numeric: tabular-nums;
   margin-top: 1px;
+  /* Bei einem Teilbesuch steht ein ✂ davor – das kippt die Zeile sonst auf zwei
+     und nimmt dem Namen eine Zeile weg. Eine Uhrzeit bricht nie um. */
+  white-space: nowrap;
 }
-.set .meta { display: block; font-size: 10px; color: var(--fg-faint); margin-top: 1px; }
+/* Genre ist das Unwichtigste im Block und bekommt darum hoechstens eine Zeile. */
+.set .meta {
+  display: block;
+  font-size: 10px;
+  color: var(--fg-faint);
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .set.fav {
   /* Erste Zeile ist der Rueckfall fuer Browser ohne color-mix */
@@ -439,10 +453,10 @@ button, input, select {
 .set.nometa .meta { display: none; }
 .set.short { padding: 2px 6px; }
 .set.short .time, .set.short .meta { display: none; }
-/* Letzte Stufe: In einen 15-Minuten-Balken passt genau eine Zeile. Lieber sauber
-   mit Auslassungspunkten kappen als den Namen unten anschneiden – vollstaendig
-   steht er in der Listenansicht. */
-.set.squeeze .artist { font-size: 11px; line-height: 1.15; -webkit-line-clamp: 1; }
+/* Letzte Stufe: kleinere Schrift, damit mehr Zeilen in den Balken passen.
+   Reicht auch das nicht, kappt fitBlocks() mit Auslassungspunkten – vollstaendig
+   steht der Name in der Listenansicht und im Tooltip. */
+.set.squeeze .artist { font-size: 11px; line-height: 1.15; }
 
 /* ---------- Listenansicht ---------- */
 .list { display: flex; flex-direction: column; gap: 22px; }
