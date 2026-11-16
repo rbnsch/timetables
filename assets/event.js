@@ -556,8 +556,8 @@
     if (now >= s._start && now <= s._end) cls.push('playing');
     else if (markPast && s._end < now) cls.push('past');
     if (state.query && !matching.has(s.id)) cls.push('dimmed');
-    // Nur wirklich flache Bloecke verlieren Zeit und Genre – ein 45-min-Set hat dafuer Platz.
-    if (s._dur <= 25) cls.push('short');
+    // Ob Zeit und Genre reinpassen, entscheidet nicht die Dauer, sondern die
+    // gerenderte Hoehe – die haengt an --ppm und an der Spaltenbreite. Siehe fitBlocks().
     return cls;
   }
 
@@ -664,6 +664,8 @@
 
         return '<div class="' + cls.join(' ') + '" role="button" tabindex="0" ' +
           'style="' + TT.escapeHtml(style) + '" data-set="' + TT.escapeHtml(s.id) + '" ' +
+          // Lange Namen werden in flachen Bloecken gekappt – hier stehen sie ganz.
+          'title="' + TT.escapeHtml(s.artist) + '" ' +
           'aria-pressed="' + isFav(s) + '">' +
           shadeHtml(s, part, ppm, blockH) +
           '<span class="artist">' + TT.escapeHtml(s.artist) + badges(s) + '</span>' +
@@ -693,6 +695,25 @@
         '</div>' +
       '</div>';
 
+    fitBlocks(host);
+  }
+
+  // Wie viel in einen Block passt, haengt von --ppm (am Handy 1.25 statt 1.6) und
+  // von der Spaltenbreite ab – ein Name, der am Desktop einzeilig ist, braucht am
+  // Handy zwei Zeilen. Darum nach dem Rendern messen statt nach Minuten schaetzen.
+  function fitBlocks(host) {
+    const blocks = Array.prototype.slice.call(host.querySelectorAll('.set'));
+    blocks.forEach((el) => el.classList.remove('nometa', 'short', 'squeeze'));
+    const zuHoch = (el) => el.scrollHeight > el.clientHeight;
+
+    // Jede Stufe erst komplett setzen, dann neu messen – sonst rechnet der
+    // Browser pro Block einmal das Layout neu.
+    let rest = blocks.filter(zuHoch);
+    rest.forEach((el) => el.classList.add('nometa'));
+    rest = rest.filter(zuHoch);
+    rest.forEach((el) => el.classList.add('short'));
+    rest = rest.filter(zuHoch);
+    rest.forEach((el) => el.classList.add('squeeze'));
   }
 
   function maybeScrollToNow() {

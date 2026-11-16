@@ -160,9 +160,17 @@ Bei einem Open Air, das mittags beginnt und vor Mitternacht endet, kann der Wert
 
 ### Sehr kurze Sets
 
-Blöcke bis 25 Minuten sind im Raster zu flach für mehr als den Namen – dort blendet die
-Seite Uhrzeit und Genre aus (`.set.short`). In der Listenansicht steht immer alles.
-Wer hier etwas ändert: Die Schwelle steht in `assets/event.js` in `setClasses`.
+Kurze Sets ergeben flache Blöcke, in die nicht alles passt – am Handy noch weniger als am
+Desktop, weil die Spalten schmaler sind und lange Namen dort zweizeilig werden.
+
+`fitBlocks()` in `assets/event.js` misst deshalb nach jedem Rendern die echte Höhe und nimmt
+nur so viel weg wie nötig: erst das Genre, dann die Uhrzeit, zuletzt wird der Name kleiner
+und mit Auslassungspunkten gekappt. In der Listenansicht steht immer alles, und der volle
+Name hängt als Tooltip am Block.
+
+Wichtig dabei: `.set > span { flex: 0 0 auto }` in der CSS. Ohne das schrumpfen Name, Zeit
+und Genre gemeinsam, bis der Name mitten im Buchstaben abgeschnitten ist – und weil nichts
+überläuft, kann `fitBlocks()` das dann auch nicht mehr erkennen.
 
 ## Farben pro Event
 

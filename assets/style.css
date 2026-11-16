@@ -342,6 +342,9 @@ button, input, select {
   font-weight: 600;
   font-size: 13px;
   line-height: 1.25;
+  /* In 96px breiten Handy-Spalten passt "LEKKERFACES" in keine Zeile. Ohne das
+     wird mittendrin abgeschnitten, und zwar ohne Auslassungspunkte. */
+  overflow-wrap: anywhere;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -415,8 +418,20 @@ button, input, select {
 
 .set.cancelled { opacity: .5; }
 .set.cancelled .artist { text-decoration: line-through; }
+/* Ohne das schrumpfen Name, Zeit und Genre im Flex-Block gemeinsam, bis der
+   Name mitten im Buchstaben abgeschnitten ist – und der Ueberlauf laesst sich
+   dann nicht mehr messen. Lieber ueberlaufen lassen; fitBlocks() raeumt auf. */
+.set > span { flex: 0 0 auto; }
+
+/* Drei Stufen, die fitBlocks() nach echter Hoehe vergibt – zuerst faellt das
+   Genre weg, dann die Uhrzeit, zuletzt wird der Name kleiner. */
+.set.nometa .meta { display: none; }
 .set.short { padding: 2px 6px; }
 .set.short .time, .set.short .meta { display: none; }
+/* Letzte Stufe: In einen 15-Minuten-Balken passt genau eine Zeile. Lieber sauber
+   mit Auslassungspunkten kappen als den Namen unten anschneiden – vollstaendig
+   steht er in der Listenansicht. */
+.set.squeeze .artist { font-size: 11px; line-height: 1.15; -webkit-line-clamp: 1; }
 
 /* ---------- Listenansicht ---------- */
 .list { display: flex; flex-direction: column; gap: 22px; }
@@ -644,6 +659,9 @@ dialog .partrow input[type="time"] {
   .brand .venue { display: none; }
   .grid-scroll { max-height: calc(100vh - 210px); }
   .lane, .grid-head .floorname { min-width: 96px; }
+  /* 1px weniger haelt Namen wie BREATHLESS oder NOISEFLOW in einer Zeile,
+     statt sie mitten im Wort umzubrechen. */
+  .set .artist { font-size: 12px; }
   .row .when { flex-basis: 62px; }
 }
 
