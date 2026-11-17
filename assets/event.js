@@ -506,7 +506,11 @@
   function render(opts) {
     const keepScroll = opts && opts.keepScroll;
     const scroller = $('.grid-scroll');
-    const prevScroll = keepScroll && scroller ? scroller.scrollTop : null;
+    // Beide Richtungen merken: Das Raster scrollt bei fuenf Floors auch zur Seite,
+    // und wer bei Eclipse etwas markiert, will nicht wieder bei Space landen.
+    const prevScroll = keepScroll && scroller
+      ? { top: scroller.scrollTop, left: scroller.scrollLeft }
+      : null;
 
     const sets = visibleSets();
     const favCount = activeIds().size;
@@ -534,8 +538,10 @@
     else renderList(host, matching);
 
     const newScroller = $('.grid-scroll');
-    if (prevScroll != null && newScroller) newScroller.scrollTop = prevScroll;
-    else if (state.view === 'grid') maybeScrollToNow();
+    if (prevScroll && newScroller) {
+      newScroller.scrollTop = prevScroll.top;
+      newScroller.scrollLeft = prevScroll.left;
+    } else if (state.view === 'grid') maybeScrollToNow();
   }
 
   function updateCount(shown, total) {
