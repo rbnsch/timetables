@@ -33,7 +33,7 @@
   "sets": [
     { "id": "sp01", "day": "d1", "floor": "space", "artist": "PJANA", "start": "16:00", "end": "17:00" },
     { "id": "sp02", "day": "d1", "floor": "space", "artist": "SHDW", "start": "17:00", "end": "18:30" },
-    { "id": "sp03", "day": "d1", "floor": "space", "artist": "DARIA KOLOSOVA", "start": "18:30", "end": "19:30" },
+    { "id": "sp03", "day": "d1", "floor": "space", "artist": "DARIA KOLOSOVA", "start": "18:30", "end": "20:00" },
     { "id": "sp04", "day": "d1", "floor": "space", "artist": "I HATE MODELS", "start": "20:00", "end": "21:30" },
     { "id": "sp05", "day": "d1", "floor": "space", "artist": "YANAMASTE B2B ALARICO", "start": "21:30", "end": "23:00" },
     { "id": "sp06", "day": "d1", "floor": "space", "artist": "KLANG KUENSTLER", "start": "23:00", "end": "01:00" },
