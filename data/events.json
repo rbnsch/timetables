@@ -1,6 +1,7 @@
 {
   "_comment": "Liste aller Event-Dateien. Neues Event = neue Datei in data/ anlegen und hier den Dateinamen ergaenzen.",
   "events": [
+    "contact-2026.json",
     "hardshift-2026.json",
     "groove-ruine-3-2026.json",
     "bcco-2026.json",

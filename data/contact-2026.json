@@ -1,0 +1,81 @@
+{
+  "id": "contact-2026",
+  "name": "CONTACT",
+  "venue": "Zenith – Kesselhaus – Kohlebunker – Dampfdom, München",
+  "dayBoundaryHour": 6,
+
+  "theme": {
+    "accent": "#e8232a",
+    "accentFg": "#ffffff",
+    "bg": "#0a0a0c",
+    "bgRaised": "#17161a",
+    "bgSunken": "#060607",
+    "line": "#3d2228",
+    "lineSoft": "#241418",
+    "fg": "#f4f1f1",
+    "fgDim": "#a79ba0",
+    "fgFaint": "#6d6166",
+    "live": "#ffd23f"
+  },
+
+  "days": [
+    { "id": "d1", "label": "Samstag", "date": "2026-12-05" }
+  ],
+
+  "floors": [
+    { "id": "space", "name": "Space", "color": "#e8232a" },
+    { "id": "orbit", "name": "Orbit", "mc": "Hate Cage", "color": "#ff6b35" },
+    { "id": "nova", "name": "Nova", "color": "#ff2d6f" },
+    { "id": "atlas", "name": "Atlas", "color": "#b31236" },
+    { "id": "eclipse", "name": "Eclipse", "mc": "Hive", "color": "#ff9e80" }
+  ],
+
+  "sets": [
+    { "id": "sp01", "day": "d1", "floor": "space", "artist": "PJANA", "start": "16:00", "end": "17:00" },
+    { "id": "sp02", "day": "d1", "floor": "space", "artist": "SHDW", "start": "17:00", "end": "18:30" },
+    { "id": "sp03", "day": "d1", "floor": "space", "artist": "DARIA KOLOSOVA", "start": "18:30", "end": "19:30" },
+    { "id": "sp04", "day": "d1", "floor": "space", "artist": "I HATE MODELS", "start": "20:00", "end": "21:30" },
+    { "id": "sp05", "day": "d1", "floor": "space", "artist": "YANAMASTE B2B ALARICO", "start": "21:30", "end": "23:00" },
+    { "id": "sp06", "day": "d1", "floor": "space", "artist": "KLANG KUENSTLER", "start": "23:00", "end": "01:00" },
+    { "id": "sp07", "day": "d1", "floor": "space", "artist": "KALTE LIEBE", "note": "Solo DJ Set", "start": "01:00", "end": "02:00" },
+    { "id": "sp08", "day": "d1", "floor": "space", "artist": "KOBOSIL", "start": "02:00", "end": "03:30" },
+    { "id": "sp09", "day": "d1", "floor": "space", "artist": "CHARLIE SPARKS", "start": "03:30", "end": "05:00" },
+
+    { "id": "or01", "day": "d1", "floor": "orbit", "artist": "ROMAN WEBER", "start": "15:00", "end": "16:00" },
+    { "id": "or02", "day": "d1", "floor": "orbit", "artist": "BEN TECHY", "start": "16:00", "end": "18:00" },
+    { "id": "or03", "day": "d1", "floor": "orbit", "artist": "IN VERRUF B2B ORNELLA", "start": "18:00", "end": "19:00" },
+    { "id": "or04", "day": "d1", "floor": "orbit", "artist": "NOVAH", "start": "19:00", "end": "21:00" },
+    { "id": "or05", "day": "d1", "floor": "orbit", "artist": "KUKO", "start": "21:00", "end": "22:30" },
+    { "id": "or06", "day": "d1", "floor": "orbit", "artist": "NIKOLINA", "start": "22:30", "end": "00:00" },
+    { "id": "or07", "day": "d1", "floor": "orbit", "artist": "A.N.I.", "start": "00:00", "end": "01:30" },
+    { "id": "or08", "day": "d1", "floor": "orbit", "artist": "NICOLAS JULIAN", "start": "01:30", "end": "03:30" },
+    { "id": "or09", "day": "d1", "floor": "orbit", "artist": "RESTRICTED", "start": "03:30", "end": "05:00" },
+
+    { "id": "nv01", "day": "d1", "floor": "nova", "artist": "DJ KUSCHELSCHAL", "start": "16:00", "end": "17:30" },
+    { "id": "nv02", "day": "d1", "floor": "nova", "artist": "NOISE MAFIA", "start": "17:30", "end": "19:30" },
+    { "id": "nv03", "day": "d1", "floor": "nova", "artist": "2HOT2PLAY", "start": "19:30", "end": "21:30" },
+    { "id": "nv04", "day": "d1", "floor": "nova", "artist": "JOHANNES SCHUSTER", "start": "21:30", "end": "23:00" },
+    { "id": "nv05", "day": "d1", "floor": "nova", "artist": "PRADA2000", "start": "23:00", "end": "00:30" },
+    { "id": "nv06", "day": "d1", "floor": "nova", "artist": "UEBERREST", "start": "00:30", "end": "02:00" },
+    { "id": "nv07", "day": "d1", "floor": "nova", "artist": "DJ DRECKISCH", "start": "02:00", "end": "03:30" },
+    { "id": "nv08", "day": "d1", "floor": "nova", "artist": "SAIKA", "start": "03:30", "end": "05:00" },
+
+    { "id": "at01", "day": "d1", "floor": "atlas", "artist": "SCHWEISSBRENNER", "start": "15:45", "end": "17:00" },
+    { "id": "at02", "day": "d1", "floor": "atlas", "artist": "NIIKITA", "start": "17:00", "end": "18:30" },
+    { "id": "at03", "day": "d1", "floor": "atlas", "artist": "NATTE VISSTICK", "start": "18:30", "end": "20:30" },
+    { "id": "at04", "day": "d1", "floor": "atlas", "artist": "ELMEFTI", "start": "20:30", "end": "22:00" },
+    { "id": "at05", "day": "d1", "floor": "atlas", "artist": "ONLYNUMBERS", "start": "22:00", "end": "23:00" },
+    { "id": "at06", "day": "d1", "floor": "atlas", "artist": "REINIER ZONNEVELD", "note": "pres. Hardkar", "start": "23:00", "end": "00:30" },
+    { "id": "at07", "day": "d1", "floor": "atlas", "artist": "VENDEX", "start": "00:30", "end": "02:00" },
+    { "id": "at08", "day": "d1", "floor": "atlas", "artist": "NEGITIV", "start": "02:00", "end": "03:30" },
+    { "id": "at09", "day": "d1", "floor": "atlas", "artist": "TOXIC MACHINERY", "start": "03:30", "end": "05:00" },
+
+    { "id": "ec01", "day": "d1", "floor": "eclipse", "artist": "MYPD", "start": "17:30", "end": "18:30" },
+    { "id": "ec02", "day": "d1", "floor": "eclipse", "artist": "DJ DRECKISCH B2B PRADA2000", "start": "18:30", "end": "20:00" },
+    { "id": "ec03", "day": "d1", "floor": "eclipse", "artist": "JOHANNES SCHUSTER B2B NOTMYTYPE", "start": "20:00", "end": "21:30" },
+    { "id": "ec04", "day": "d1", "floor": "eclipse", "artist": "A.N.I. B2B NATTE VISSTICK", "start": "21:30", "end": "23:00" },
+    { "id": "ec05", "day": "d1", "floor": "eclipse", "artist": "NEGITIV B2B NICOLAS JULIAN", "start": "23:00", "end": "00:30" },
+    { "id": "ec06", "day": "d1", "floor": "eclipse", "artist": "BEN TECHY B2B LUCIID", "start": "00:30", "end": "02:30" },
+    { "id": "ec07", "day": "d1", "floor": "eclipse", "artist": "SLVL B2B USH", "start": "02:30", "end": "04:00" }
+  ]
+}
