@@ -710,7 +710,7 @@
   function fitBlocks(host) {
     const blocks = Array.prototype.slice.call(host.querySelectorAll('.set'));
     blocks.forEach((el) => {
-      el.classList.remove('starroom', 'nometa', 'squeeze', 'tight', 'short');
+      el.classList.remove('starroom', 'nometa', 'nebenan', 'squeeze', 'tight', 'short');
       // Erst ungekuerzt messen, sonst zaehlt man die Kuerzung von eben mit.
       el.style.setProperty('--zeilen', '99');
     });
@@ -725,17 +725,38 @@
     const nameAbgeschnitten = (el) =>
       zeilenPlatz(el) < textZeilen(el.querySelector('.artist')).length;
 
-    // Reihenfolge = Rangfolge: Genre weg, Name kleiner, Raender enger – und erst
-    // ganz zuletzt die Uhrzeit. Kleinere Schrift kostet nur Lesbarkeit, eine
-    // fehlende Uhrzeit kostet Information. "VICIOUZ VS BRAINSTORM" braucht drei
-    // Zeilen; in 11px passen die neben die Uhrzeit, in 12px nicht.
-    // Jede Stufe erst komplett setzen, dann neu messen – sonst rechnet der
-    // Browser pro Block einmal das Layout neu.
+    // Zuerst das Genre, das Unwichtigste im Block. Jede Stufe erst komplett setzen,
+    // dann neu messen – sonst rechnet der Browser pro Block einmal das Layout neu.
     let rest = blocks.filter(nameAbgeschnitten);
-    ['nometa', 'squeeze', 'tight', 'short'].forEach((stufe) => {
+    rest.forEach((el) => el.classList.add('nometa'));
+    rest = rest.filter(nameAbgeschnitten);
+
+    // Flach, aber breit: ein 30-Minuten-Block auf einem Einzelfloor ist 34px hoch
+    // und 330px breit. Untereinander passen Name und Uhrzeit nicht, nebeneinander
+    // muehelos. Das kostet weder Zeile noch Schriftgroesse – anders als alles
+    // Folgende. In einer 96px schmalen Handyspalte hilft es dagegen nicht, dort
+    // bleibt vom Namen neben der Uhrzeit nichts uebrig. Also setzen, nachmessen
+    // und bei denen wieder abnehmen, bei denen es nicht aufgeht.
+    const versuchNebenan = (liste) => {
+      const offen = liste.filter((el) => !el.classList.contains('nebenan'));
+      offen.forEach((el) => el.classList.add('nebenan'));
+      offen.forEach((el) => { if (nameAbgeschnitten(el)) el.classList.remove('nebenan'); });
+      return liste.filter(nameAbgeschnitten);
+    };
+    rest = versuchNebenan(rest);
+
+    // Reihenfolge = Rangfolge: Name kleiner, Raender enger – und erst ganz zuletzt
+    // die Uhrzeit. Kleinere Schrift kostet nur Lesbarkeit, eine fehlende Uhrzeit
+    // kostet Information. "VICIOUZ VS BRAINSTORM" braucht drei Zeilen; in 11px
+    // passen die neben die Uhrzeit, in 12px nicht.
+    //
+    // Nach jeder Stufe nochmal nebeneinander versuchen: "LEKKERFACES & MIND
+    // COMPRESSOR" ist in 13px zwei Pixel zu breit fuer die Zeile, in 11px passt es.
+    ['squeeze', 'tight'].forEach((stufe) => {
       rest.forEach((el) => el.classList.add(stufe));
-      rest = rest.filter(nameAbgeschnitten);
+      rest = versuchNebenan(rest.filter(nameAbgeschnitten));
     });
+    rest.forEach((el) => el.classList.add('short'));
 
     // Die Stufen haben den Umbruch veraendert – "DR DONK VS DIMITRI K" rutscht
     // erst jetzt unter den ★. Nachreservieren, aber nur wenn der Name dadurch
@@ -776,13 +797,17 @@
     const cs = getComputedStyle(el);
     const lh = parseFloat(getComputedStyle(name).lineHeight) || 16;
     let belegt = 0;
-    Array.prototype.slice.call(el.children).forEach((kind) => {
-      if (kind === name) return;
-      const ks = getComputedStyle(kind);
-      // ★ und Teilbesuch-Schatten liegen ueber dem Block, nicht darin.
-      if (ks.position === 'absolute' || ks.display === 'none') return;
-      belegt += kind.offsetHeight + (parseFloat(ks.marginTop) || 0);
-    });
+    // Im Zeilen-Layout steht die Uhrzeit neben dem Namen – sie nimmt ihm Breite
+    // weg, aber keine Hoehe. Die Breite steckt ohnehin schon im gemessenen Umbruch.
+    if (!el.classList.contains('nebenan')) {
+      Array.prototype.slice.call(el.children).forEach((kind) => {
+        if (kind === name) return;
+        const ks = getComputedStyle(kind);
+        // ★ und Teilbesuch-Schatten liegen ueber dem Block, nicht darin.
+        if (ks.position === 'absolute' || ks.display === 'none') return;
+        belegt += kind.offsetHeight + (parseFloat(ks.marginTop) || 0);
+      });
+    }
     const frei = el.clientHeight
       - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - belegt;
     return Math.floor((frei + 0.5) / lh);
@@ -790,10 +815,27 @@
 
   // Umbrueche sind erst nach dem Layout bekannt – ein Range liefert pro
   // Textzeile ein eigenes Rechteck, das Element selbst nur die Huelle.
+  //
+  // Aber nicht nur pro Zeile: Ein Abzeichen im Namen ("b2b", "abgesagt") ist ein
+  // inline-block und steuert zwei weitere Rechtecke bei, obwohl es auf derselben
+  // Zeile steht. Ungruppiert zaehlt "KROWDEXX vs HOLY PRIEST b2b" als drei Zeilen,
+  // und der Block wirft Uhrzeit und Namensende weg, die laengst passten. Darum
+  // Rechtecke zusammenfassen, die sich senkrecht ueberlappen – eine Zeile ist,
+  // was auf einer Hoehe steht.
   function textZeilen(el) {
     const r = document.createRange();
     r.selectNodeContents(el);
-    return Array.prototype.slice.call(r.getClientRects());
+    const zeilen = [];
+    Array.prototype.slice.call(r.getClientRects()).forEach((z) => {
+      const mitte = (z.top + z.bottom) / 2;
+      const zeile = zeilen.find((v) => mitte > v.top && mitte < v.bottom);
+      if (!zeile) { zeilen.push({ top: z.top, bottom: z.bottom, left: z.left, right: z.right }); return; }
+      zeile.top = Math.min(zeile.top, z.top);
+      zeile.bottom = Math.max(zeile.bottom, z.bottom);
+      zeile.left = Math.min(zeile.left, z.left);
+      zeile.right = Math.max(zeile.right, z.right);
+    });
+    return zeilen;
   }
 
   // Die Flaeche des ★ ist 30x28 gross, das Zeichen darin nur ein Dutzend Pixel.

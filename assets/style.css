@@ -454,6 +454,17 @@ button, input, select {
    Uhrzeit – die beiden mittleren Stufen kosten Lesbarkeit, die letzte kostet
    Information. */
 .set.nometa .meta { display: none; }
+/* Flache, breite Bloecke: Uhrzeit neben den Namen statt darunter. Kostet dem Namen
+   Breite statt einer ganzen Zeile – auf einem Einzelfloor ein Tausch ohne Verlust. */
+.set.nebenan { flex-direction: row; align-items: center; column-gap: 8px; }
+.set.nebenan .artist { flex: 1 1 auto; min-width: 0; padding-right: 0; }
+/* Uhrzeit nie hoeher als eine Namenszeile: sonst waere die Zeile hoeher als das,
+   was zeilenPlatz() rechnet, und ein 21px hoher 15-Minuten-Block laeuft ueber.
+   Mit align-items:center ist die Zeilenhoehe genau die des Namens. */
+.set.nebenan .time { flex: 0 0 auto; margin-top: 0; line-height: 1.15; }
+/* Der ★ sitzt oben rechts – da steht jetzt die Uhrzeit. Also den ganzen Block
+   einruecken statt wie sonst nur den Namen. */
+.set.nebenan.fav { padding-right: 20px; }
 /* Kleinere Schrift bringt beides: mehr Zeilen in den Block und kuerzere Zeilen. */
 .set.squeeze .artist { font-size: 11px; line-height: 1.15; }
 .set.tight { padding: 2px 6px; }
