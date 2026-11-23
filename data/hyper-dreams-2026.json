@@ -1,0 +1,41 @@
+{
+  "id": "hyper-dreams-2026",
+  "name": "Hyper Dreams",
+  "venue": "Gotec, Gablonzer Straße 11, Karlsruhe",
+  "dayBoundaryHour": 10,
+
+  "theme": {
+    "accent": "#7b9ae0",
+    "accentFg": "#0a1228",
+    "bg": "#0a0b12",
+    "bgRaised": "#171a26",
+    "bgSunken": "#06070c",
+    "line": "#2e3752",
+    "lineSoft": "#1c2134",
+    "fg": "#f0f1f7",
+    "fgDim": "#a3a9be",
+    "fgFaint": "#6c7288",
+    "live": "#e8402a"
+  },
+
+  "days": [
+    { "id": "d1", "label": "Samstag", "date": "2026-11-28" }
+  ],
+
+  "floors": [
+    { "id": "main", "name": "Mainfloor", "color": "#7b9ae0" },
+    { "id": "boiler", "name": "Boiler", "color": "#e8402a" }
+  ],
+
+  "sets": [
+    { "id": "m01", "day": "d1", "floor": "main", "artist": "SPORTSCHUH B2B BNZN ANL", "start": "22:00", "end": "00:00" },
+    { "id": "m02", "day": "d1", "floor": "main", "artist": "PØNTI", "start": "00:00", "end": "02:00" },
+    { "id": "m03", "day": "d1", "floor": "main", "artist": "DJ SEXSTASY", "start": "02:00", "end": "04:00" },
+    { "id": "m04", "day": "d1", "floor": "main", "artist": "KALTE LIEBE", "note": "Solo DJ Set", "start": "04:00", "end": "06:00" },
+    { "id": "m05", "day": "d1", "floor": "main", "artist": "FLOX/EV", "start": "06:00", "end": "08:00" },
+
+    { "id": "b01", "day": "d1", "floor": "boiler", "artist": "ANTIGEN", "start": "00:00", "end": "02:00" },
+    { "id": "b02", "day": "d1", "floor": "boiler", "artist": "SHOKI287", "start": "02:00", "end": "04:00" },
+    { "id": "b03", "day": "d1", "floor": "boiler", "artist": "DJ GUESTLIST", "start": "04:00", "end": "06:00" }
+  ]
+}
