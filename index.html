@@ -107,14 +107,14 @@
         '<span class="faint">Eine JSON-Datei in <code>data/</code> anlegen und in ' +
         '<code>data/events.json</code> eintragen.</span></div>';
     } else {
-      // Kommende Events zuerst, vergangene nach hinten.
+      // Nach Datum, das am weitesten entfernte zuoberst. Vergangenes rutscht dadurch
+      // von selbst ans Ende – es liegt ja zwangslaeufig vor allem Kommenden.
+      const startOf = (ev) => ev.sets.length ? Math.min(...ev.sets.map((s) => +s._start || Infinity)) : 0;
       const endOf = (ev) => ev.sets.length ? Math.max(...ev.sets.map((s) => +s._end || 0)) : 0;
       const now = Date.now();
-      events.sort((a, b) => {
-        const pa = endOf(a) < now, pb = endOf(b) < now;
-        if (pa !== pb) return pa ? 1 : -1;
-        return endOf(a) - endOf(b);
-      });
+      // Sortiert wird nach dem Beginn, nicht nach dem Ende: auf der Karte steht das
+      // Anfangsdatum, und danach soll sich die Reihenfolge auch richten.
+      events.sort((a, b) => (startOf(b) - startOf(a)) || (endOf(b) - endOf(a)));
 
       host.innerHTML = '<div class="cards">' + events.map((ev) => {
         const favs = TT.readStore('tt.fav.' + ev.id, []).length;
