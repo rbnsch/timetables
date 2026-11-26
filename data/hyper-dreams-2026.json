@@ -24,18 +24,21 @@
 
   "floors": [
     { "id": "main", "name": "Mainfloor", "color": "#7b9ae0" },
-    { "id": "boiler", "name": "Boiler", "color": "#e8402a" }
+    { "id": "boiler", "name": "Boiler", "color": "#e8402a" },
+    { "id": "koede", "name": "Køde", "color": "#d9c9ae" }
   ],
 
   "sets": [
-    { "id": "m01", "day": "d1", "floor": "main", "artist": "SPORTSCHUH B2B BNZN ANL", "start": "22:00", "end": "00:00" },
+    { "id": "m01", "day": "d1", "floor": "main", "artist": "TELETIMMY", "start": "22:00", "end": "00:00" },
     { "id": "m02", "day": "d1", "floor": "main", "artist": "PØNTI", "start": "00:00", "end": "02:00" },
     { "id": "m03", "day": "d1", "floor": "main", "artist": "DJ SEXSTASY", "start": "02:00", "end": "04:00" },
-    { "id": "m04", "day": "d1", "floor": "main", "artist": "KALTE LIEBE", "note": "Solo DJ Set", "start": "04:00", "end": "06:00" },
-    { "id": "m05", "day": "d1", "floor": "main", "artist": "FLOX/EV", "start": "06:00", "end": "08:00" },
+    { "id": "m04", "day": "d1", "floor": "main", "artist": "KALTE LIEBE", "note": "Solo DJ Set", "start": "04:00", "end": "05:30" },
+    { "id": "m05", "day": "d1", "floor": "main", "artist": "FLOX/EV", "start": "05:30", "end": "07:30" },
 
     { "id": "b01", "day": "d1", "floor": "boiler", "artist": "ANTIGEN", "start": "00:00", "end": "02:00" },
     { "id": "b02", "day": "d1", "floor": "boiler", "artist": "SHOKI287", "start": "02:00", "end": "04:00" },
-    { "id": "b03", "day": "d1", "floor": "boiler", "artist": "DJ GUESTLIST", "start": "04:00", "end": "06:00" }
+    { "id": "b03", "day": "d1", "floor": "boiler", "artist": "DJ GUESTLIST", "start": "04:00", "end": "06:00" },
+
+    { "id": "k01", "day": "d1", "floor": "koede", "artist": "DJ SPORTSCHUH B2B BNZN ANL", "start": "23:00", "end": "05:00" }
   ]
 }
