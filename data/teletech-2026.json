@@ -1,0 +1,50 @@
+{
+  "id": "teletech-2026",
+  "name": "Teletech Showcase",
+  "venue": "Gotec, Karlsruhe",
+  "dayBoundaryHour": 10,
+
+  "theme": {
+    "accent": "#28e8ab",
+    "accentFg": "#032b1e",
+    "bg": "#04100b",
+    "bgRaised": "#0b1f17",
+    "bgSunken": "#020805",
+    "line": "#164a36",
+    "lineSoft": "#0e2e22",
+    "fg": "#e3fffc",
+    "fgDim": "#9cc4b6",
+    "fgFaint": "#5f8a7b",
+    "live": "#ffffff"
+  },
+
+  "days": [
+    { "id": "d1", "label": "Freitag", "date": "2026-11-27" }
+  ],
+
+  "floors": [
+    { "id": "main", "name": "Mainfloor", "color": "#28e8ab" },
+    { "id": "boiler", "name": "Boiler", "color": "#3bf15e" },
+    { "id": "koede", "name": "Køde", "color": "#49eae7" }
+  ],
+
+  "sets": [
+    { "id": "m01", "day": "d1", "floor": "main", "artist": "XIORRO", "note": "Schranz Set", "start": "22:00", "end": "00:00" },
+    { "id": "m02", "day": "d1", "floor": "main", "artist": "THANDER", "note": "Tham B2B Kander", "start": "00:00", "end": "02:30" },
+    { "id": "m03", "day": "d1", "floor": "main", "artist": "TRIPTYKH", "start": "02:30", "end": "04:30" },
+    { "id": "m04", "day": "d1", "floor": "main", "artist": "MR. POLSKA", "note": "Live", "start": "04:30", "end": "05:30" },
+    { "id": "m05", "day": "d1", "floor": "main", "artist": "MAD DOG", "start": "05:30", "end": "07:00" },
+    { "id": "m06", "day": "d1", "floor": "main", "artist": "KIRSTY", "start": "07:00", "end": "08:30" },
+
+    { "id": "b01", "day": "d1", "floor": "boiler", "artist": "PANA", "start": "23:00", "end": "00:30" },
+    { "id": "b02", "day": "d1", "floor": "boiler", "artist": "HANÀ", "start": "00:30", "end": "02:00" },
+    { "id": "b03", "day": "d1", "floor": "boiler", "artist": "TESTPRESS", "start": "02:00", "end": "03:30" },
+    { "id": "b04", "day": "d1", "floor": "boiler", "artist": "DJ DRECKISH", "note": "Live", "start": "03:30", "end": "05:00" },
+    { "id": "b05", "day": "d1", "floor": "boiler", "artist": "THISO", "start": "05:00", "end": "06:30" },
+
+    { "id": "k01", "day": "d1", "floor": "koede", "artist": "LILLI & EVY", "start": "00:00", "end": "01:30" },
+    { "id": "k02", "day": "d1", "floor": "koede", "artist": "TWO GIRLS ONE MOM", "start": "01:30", "end": "03:00" },
+    { "id": "k03", "day": "d1", "floor": "koede", "artist": "RIANA HOLLEY", "start": "03:00", "end": "04:30" },
+    { "id": "k04", "day": "d1", "floor": "koede", "artist": "STINNY STONE", "start": "04:30", "end": "06:00" }
+  ]
+}
